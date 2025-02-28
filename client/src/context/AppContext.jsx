@@ -1,21 +1,47 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { jobsData } from "../assets/assets";
 
- export const AppContext = createContext()
- export const AppContextProvider = (props)=>{
-   const [searchFilter, setSearchFilter] = useState({
-      title: '',
-      location: '',
+export const AppContext = createContext();
 
-   })
-   const [isSearched,setIsSearched] = useState(false)
-    const value = {
-      setSearchFilter,searchFilter,isSearched,setIsSearched
+export const AppContextProvider = (props) => {
+  const [searchFilter, setSearchFilter] = useState({
+    title: "",
+    location: "",
+  });
+  const [isSearched, setIsSearched] = useState(false);
+  const [jobs, setJobs] = useState([]);
 
+  // Function to fetch and filter job data
+  useEffect(() => {
+    const fetchJobs = () => {
+      let filteredJobs = jobsData;
 
-    }
-     return (<AppContext.Provider value={value}>
-        {props.children}
-     </AppContext.Provider>)
-   
+      if (searchFilter.title) {
+        filteredJobs = filteredJobs.filter((job) =>
+          job.title.toLowerCase().includes(searchFilter.title.toLowerCase())
+        );
+      }
 
- }
+      if (searchFilter.location) {
+        filteredJobs = filteredJobs.filter((job) =>
+          job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
+        );
+      }
+
+      setJobs(filteredJobs);
+    };
+
+    fetchJobs();
+  }, [searchFilter]); // Re-run filtering when searchFilter changes
+
+  const value = {
+    setSearchFilter,
+    searchFilter,
+    isSearched,
+    setIsSearched,
+    jobs, // Use jobs instead of jobsData
+    setJobs,
+  };
+
+  return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
+};
