@@ -83,14 +83,68 @@ export const JobCategories = [
 ]
 
 export const JobLocations = [
-    "Bangalore",
-    "Washington",
-    "Hyderabad",
-    "Mumbai",
-    "California",
-    "Chennai",
-    "New York"
-]
+  "Bangalore", "Washington", "Hyderabad", "Mumbai", "California", "Chennai", "New York",
+  "Mumbai", "Andheri", "Bandra", "Dadar", "Thane", "Navi Mumbai",
+  "Pune", "Shivaji Nagar", "Hinjewadi", "Kothrud", "Viman Nagar",
+  "Nagpur", "Dharampeth", "Sadar", "Sitabuldi", "Civil Lines",
+  "Nashik", "Panchavati", "Gangapur", "Dwarka", "Satpur",
+  "Bangalore", "Whitefield", "Koramangala", "Indiranagar", "Electronic City",
+  "Mysore", "Lakshmipuram", "Vijayanagar", "Gokulam", "Nazarbad",
+  "Hubli", "Keshwapur", "Vidya Nagar", "Deshpande Nagar",
+  "New Delhi", "Connaught Place", "Saket", "Dwarka", "Karol Bagh",
+  "South Delhi", "Hauz Khas", "Greater Kailash", "Vasant Kunj", "Lajpat Nagar",
+  "North Delhi", "Rohini", "Pitampura", "Civil Lines", "Model Town",
+  "Chennai", "T Nagar", "Anna Nagar", "Velachery", "Adyar",
+  "Coimbatore", "Gandhipuram", "RS Puram", "Saibaba Colony",
+  "Madurai", "Anna Nagar", "KK Nagar", "Tallakulam",
+  "Kolkata", "Salt Lake", "Howrah", "Park Street", "Dumdum",
+  "Siliguri", "Sevoke Road", "Hakim Para", "Pradhan Nagar",
+  "Hyderabad", "Madhapur", "Banjara Hills", "Gachibowli", "Jubilee Hills",
+  "Warangal", "Hanamkonda", "Kazipet", "Subedari",
+  "Ahmedabad", "SG Highway", "Maninagar", "Satellite", "Bopal",
+  "Surat", "Adajan", "Vesu", "Varachha",
+  "Vadodara", "Alkapuri", "Manjalpur", "Gotri",
+  "Lucknow", "Hazratganj", "Gomti Nagar", "Alambagh",
+  "Noida", "Sector 62", "Sector 18", "Greater Noida",
+  "Ghaziabad", "Indirapuram", "Raj Nagar Extension", "Vaishali",
+  "Varanasi", "Assi Ghat", "Dashashwamedh Ghat", "Sigra",
+  "Indore", "Vijay Nagar", "Palasia", "Rajwada",
+  "Bhopal", "MP Nagar", "Arera Colony", "Kolar Road",
+  "Gwalior", "Lashkar", "Morar", "Thatipur",
+  "Jaipur", "Malviya Nagar", "Vaishali Nagar", "Tonk Road",
+  "Udaipur", "Fateh Sagar", "Hiran Magri", "Sukher",
+  "Jodhpur", "Sardarpura", "Paota", "Shastri Nagar",
+
+  // Bihar - All Major Cities & Districts
+  "Patna", "Kankarbagh", "Bailey Road", "Danapur", "Rajendra Nagar",
+  "Gaya", "Bodh Gaya", "Magadh Colony", "Delha",
+  "Bhagalpur", "Barari", "Tilka Manjhi", "Adampur",
+  "Muzaffarpur", "Aghoria Bazar", "Mithanpura", "Kalambagh Chowk",
+  "Purnia", "Line Bazar", "Khuskibagh", "Bhatta Bazar",
+  "Darbhanga", "Laheriasarai", "Donar", "Benta",
+  "Bettiah", "Narkatiaganj", "Chanpatia", "Bagaha",
+  "Arrah", "Katira", "Mahadeva Road", "Pakri",
+  "Begusarai", "Balia", "Naokothi", "Matihani",
+  "Katihar", "Mirchaibari", "Barsoi", "Manihari",
+  "Munger", "Jamalpur", "Kasim Bazar", "Safiyabad",
+  "Samastipur", "Rosera", "Dalsinghsarai", "Shivaji Nagar",
+  "Chapra", "Marhaura", "Parsa", "Garkha",
+  "Motihari", "Raxaul", "Areraj", "Sugauli",
+  "Sitamarhi", "Pupri", "Riga", "Dumra",
+  "Siwan", "Mairwa", "Ziradei", "Guthani",
+  "Saharsa", "Simri Bakhtiyarpur", "Mahishi", "Saur Bazar",
+  "Kishanganj", "Thakurganj", "Bahadurganj", "Pothia",
+  "Jehanabad", "Ghoshi", "Makhdumpur", "Kako",
+  "Madhubani", "Jhanjharpur", "Laukaha", "Rajnagar",
+  "Buxar", "Dumraon", "Itarhi", "Chausa",
+  "Nalanda", "Rajgir", "Bihar Sharif", "Harnaut",
+  "Lakhisarai", "Surajgarha", "Barahiya", "Halasi",
+  "Jamui", "Sikandra", "Jhajha", "Sono",
+  "Arwal", "Karpi", "Kurtha", "Kaler",
+  "Sheikhpura", "Barbigha", "Ghat Kusumbha", "Ariari",
+  "Sheohar", "Dumri Katsari", "Piprarhi", "Purnahiya",
+  "Banka", "Amarpur", "Belhar", "Barahat"
+];
 
 // Sample data for Manage Jobs Page
 export const manageJobsData = [
@@ -156,37 +210,44 @@ export const viewApplicationsPageData = [
 
 export const jobsData = [
     {
-        _id: '1',
-        title: "Full Stack Developer",
-        location: "California",
-        level: "Senior Level",
-        companyId: {
+        "_id": "1",
+        "title": "Full Stack Developer",
+        "employmentType": "Full-Time",
+        "workMode": "Remote",
+        "location": "California",
+        "industry": "Information Technology",
+        "department": "Software Development",
+        "level": "Senior Level",
+        "companyId": {
             "_id": "670e4d25ca9fda8f1bf359b9",
             "name": "Slack",
             "email": "slack@demo.com",
-            "image": company_icon,
+            "image": "company_icon"
         },
-        description: `
-        <p>We are seeking a highly skilled Full Stack Developer to join our dynamic and innovative team. The ideal candidate will have a passion for developing scalable web applications and working across the entire technology stack, including front-end and back-end development. You will have the opportunity to work with the latest technologies and contribute to exciting projects that impact our users directly.</p>
-        <h2><strong>Key Responsibilities</strong></h2>
-        <ol>
-            <li>Build, test, and deploy highly responsive web applications.</li>
-            <li>Design user-friendly interfaces using HTML, CSS, and JavaScript.</li>
-            <li>Develop and maintain APIs and databases to support application functionality.</li>
-            <li>Collaborate with cross-functional teams to define, design, and ship new features.</li>
-            <li>Identify and resolve bottlenecks and bugs to optimize application performance.</li>
-        </ol>
-        <h2><strong>Skills Required</strong></h2>
-        <ol>
-            <li>Proficiency in HTML, CSS, and JavaScript frameworks (e.g., React, Angular).</li>
-            <li>Experience with server-side languages (e.g., Node.js, Python).</li>
-            <li>Familiarity with relational and non-relational databases (e.g., MySQL, MongoDB).</li>
-            <li>Strong understanding of web security and performance optimization.</li>
-            <li>Ability to work in an Agile environment.</li>
-        </ol>`,
-        salary: 82000,
-        date: 1729681667114,
-        category: "Programming",
+        "description": `
+            <p>We are seeking a highly skilled Full Stack Developer to join our dynamic and innovative team. The ideal candidate will have a passion for developing scalable web applications and working across the entire technology stack, including front-end and back-end development. You will have the opportunity to work with the latest technologies and contribute to exciting projects that impact our users directly.</p>
+            <h2><strong>Key Responsibilities</strong></h2>
+            <ol>
+                <li>Build, test, and deploy highly responsive web applications.</li>
+                <li>Design user-friendly interfaces using HTML, CSS, and JavaScript.</li>
+                <li>Develop and maintain APIs and databases to support application functionality.</li>
+                <li>Collaborate with cross-functional teams to define, design, and ship new features.</li>
+                <li>Identify and resolve bottlenecks and bugs to optimize application performance.</li>
+            </ol>
+            <h2><strong>Key Skills</strong></h2>
+            <ol>
+                <li>Proficiency in HTML, CSS, and JavaScript frameworks (e.g., React, Angular).</li>
+                <li>Experience with server-side languages (e.g., Node.js, Python).</li>
+                <li>Familiarity with relational and non-relational databases (e.g., MySQL, MongoDB).</li>
+                <li>Strong understanding of web security and performance optimization.</li>
+                <li>Ability to work in an Agile environment.</li>
+            </ol>
+        `,
+        "experience": "3+ Years",
+        "salaryRange": "$80,000 - $100,000 per year",
+        "qualification": "Bachelor’s degree in Computer Science or related field",
+        "date": 1729681667114,
+        "category": "Programming"
     },
     {
         _id: '2',
