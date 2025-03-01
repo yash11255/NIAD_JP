@@ -28,7 +28,7 @@ const ApplyJob = () => {
             job._id !== id &&
             (job.level === selectedJob.level || job.location === selectedJob.location)
         )
-        .slice(0, 4); // Show 4 similar jobs
+        .slice(0, 4); // Show max 4 similar jobs
 
       setSimilarJobs(filteredJobs);
     }
@@ -99,16 +99,16 @@ const ApplyJob = () => {
         {/* Right Sidebar: Similar Jobs */}
         <div className="w-full lg:w-1/4">
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-3">
-              Similar Jobs
-            </h2>
-            {similarJobs.length > 0 ? (
-              similarJobs.map((job) => (
-                <JobCard key={job._id} job={job} />
-              ))
-            ) : (
-              <p className="text-gray-500 text-center mt-4">No similar jobs found.</p>
-            )}
+            <h2 className="text-xl font-semibold text-gray-800 border-b pb-3">Similar Jobs</h2>
+            <div className="space-y-4 mt-4">
+              {similarJobs.length > 0 ? (
+                similarJobs.map((job) => (
+                  <JobCard key={job._id} job={job} />
+                ))
+              ) : (
+                <p className="text-gray-500 text-center">No similar jobs found.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

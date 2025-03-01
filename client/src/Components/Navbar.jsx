@@ -2,42 +2,35 @@ import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { UserButton, useClerk, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX } from "react-icons/fi"; // Import icons
 
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false); // State for mobile menu
 
   return (
     <div className="shadow py-4 bg-white">
-      <div className="container px-4 lg:px-20 mx-auto flex justify-between items-center">
+      <div className="container px-4 2xl:px-20 mx-auto flex justify-between items-center">
         {/* Logo */}
-        <Link to="/">
-          <img src={assets.logo} alt="Logo" className="h-10 sm:h-12" />
-        </Link>
+        <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6">
           {user ? (
             <>
-              <Link
-                to="/application"
-                className="text-gray-700 hover:text-blue-600 transition font-medium"
-              >
+              <Link to="/application" className="text-gray-600 hover:underline">
                 Applied Jobs
               </Link>
-              <span className="text-gray-500">Welcome, {user?.firstName}</span>
+              <p>Welcome, {user?.firstName}</p>
               <UserButton />
             </>
           ) : (
             <div className="flex gap-4">
-              <button className="text-gray-700 hover:text-blue-600 transition">
-                Recruiter Login
-              </button>
+              <button className="text-gray-600">Recruiter Login</button>
               <button
                 onClick={openSignIn}
-                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition shadow-md"
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
               >
                 Login
               </button>
@@ -45,10 +38,10 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Icon */}
+        {/* Mobile Menu Icon (Right Aligned) */}
         <div className="md:hidden">
           <button onClick={() => setMenuOpen(true)}>
-            <FiMenu className="w-7 h-7 text-gray-700 hover:text-blue-600 transition" />
+            <FiMenu className="w-7 h-7" />
           </button>
         </div>
       </div>
@@ -57,13 +50,10 @@ const Navbar = () => {
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform ${
           menuOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 p-6 z-50`}
+        } transition-transform duration-300 p-6`}
       >
-        {/* Close Button */}
-        <button
-          onClick={() => setMenuOpen(false)}
-          className="absolute top-4 right-4 text-gray-700 hover:text-red-500 transition"
-        >
+        {/* Close Button (Inside Menu) */}
+        <button onClick={() => setMenuOpen(false)} className="absolute top-4 right-4">
           <FiX className="w-7 h-7" />
         </button>
 
@@ -73,17 +63,17 @@ const Navbar = () => {
             <>
               <Link
                 to="/application"
-                className="text-gray-700 hover:text-blue-600 transition font-medium"
+                className="text-gray-600 hover:underline"
                 onClick={() => setMenuOpen(false)}
               >
                 Applied Jobs
               </Link>
-              <span className="text-gray-500">Welcome, {user?.firstName}</span>
+              <p>Welcome, {user?.firstName}</p>
               <UserButton />
             </>
           ) : (
             <>
-              <button className="text-gray-700 hover:text-blue-600 transition">
+              <button className="text-gray-600" onClick={() => setMenuOpen(false)}>
                 Recruiter Login
               </button>
               <button
@@ -91,7 +81,7 @@ const Navbar = () => {
                   openSignIn();
                   setMenuOpen(false);
                 }}
-                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition shadow-md"
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
               >
                 Login
               </button>

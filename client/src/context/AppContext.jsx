@@ -10,6 +10,7 @@ export const AppContextProvider = (props) => {
   });
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const[showRecruiterLogin,setShowRecruiterLogin] = useState(false)
 
   // Function to fetch and filter job data
   useEffect(() => {
@@ -41,6 +42,8 @@ export const AppContextProvider = (props) => {
     setIsSearched,
     jobs, // Use jobs instead of jobsData
     setJobs,
+    showRecruiterLogin,
+    setShowRecruiterLogin
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
