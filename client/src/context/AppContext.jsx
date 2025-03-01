@@ -10,7 +10,9 @@ export const AppContextProvider = (props) => {
   });
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
-  const[showRecruiterLogin,setShowRecruiterLogin] = useState(false)
+  const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
+
+  console.log(showRecruiterLogin);
 
   // Function to fetch and filter job data
   useEffect(() => {
@@ -25,7 +27,9 @@ export const AppContextProvider = (props) => {
 
       if (searchFilter.location) {
         filteredJobs = filteredJobs.filter((job) =>
-          job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
+          job.location
+            .toLowerCase()
+            .includes(searchFilter.location.toLowerCase())
         );
       }
 
@@ -43,8 +47,10 @@ export const AppContextProvider = (props) => {
     jobs, // Use jobs instead of jobsData
     setJobs,
     showRecruiterLogin,
-    setShowRecruiterLogin
+    setShowRecruiterLogin,
   };
 
-  return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+  );
 };
