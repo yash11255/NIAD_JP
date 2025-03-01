@@ -5,6 +5,12 @@ import Application from "./pages/Application";
 import ApplyJob from "./pages/ApplyJob";
 import RecruiterLogin from "./Components/RecruiterLogin";
 import { AppContext } from "./context/AppContext";
+import Dashboard from "./pages/Dashboard";
+import AddJobs from "./pages/AddJobs";
+import ManageJobs from "./pages/ManageJobs";
+import ViewApplications from "./pages/ViewApplications";
+import 'quill/dist/quill.snow.css'
+
 
 const App = () => {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
@@ -24,6 +30,15 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/application" element={<Application />} />
         <Route path="/apply-job/:id" element={<ApplyJob />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="add-job" element={<AddJobs />}/>
+          <Route path="manage-jobs" element={<ManageJobs />}/>
+          <Route path="view-applications" element={<ViewApplications />} />
+
+
+
+        </Route>
+
       </Routes>
     </div>
   );

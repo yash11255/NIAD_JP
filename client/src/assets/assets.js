@@ -148,10 +148,10 @@ export const JobLocations = [
 
 // Sample data for Manage Jobs Page
 export const manageJobsData = [
-    { _id: 1, title: "Full Stack Developer", date: 1729102298497, location: "Bangalore", applicants: 20 },
-    { _id: 2, title: "Data Scientist", date: 1729102298497, location: "San Francisco", applicants: 15 },
-    { _id: 3, title: "Marketing Manager", date: 1729102298497, location: "London", applicants: 2 },
-    { _id: 4, title: "UI/UX Designer", date: 1729102298497, location: "Dubai", applicants: 25 }
+    { _id: 1, jobId: "JOB-001", title: "Full Stack Developer", date: 1729102298497, location: "Bangalore", applicants: 20 },
+    { _id: 2, jobId: "JOB-002", title: "Data Scientist", date: 1729102298497, location: "San Francisco", applicants: 15 },
+    { _id: 3, jobId: "JOB-003", title: "Marketing Manager", date: 1729102298497, location: "London", applicants: 2 },
+    { _id: 4, jobId: "JOB-004", title: "UI/UX Designer", date: 1729102298497, location: "Dubai", applicants: 25 }
 ];
 
 // Sample data for Profile Page
@@ -199,13 +199,166 @@ export const jobsApplied = [
 ];
 
 export const viewApplicationsPageData = [
-    { _id: 1, name: "Richard Sanford", jobTitle: "Full Stack Developer", location: "Bangalore", imgSrc: profile_img },
-    { _id: 2, name: "Enrique Murphy", jobTitle: "Data Scientist", location: "San Francisco", imgSrc: profile_img },
-    { _id: 3, name: "Alison Powell", jobTitle: "Marketing Manager", location: "London", imgSrc: profile_img },
-    { _id: 4, name: "Richard Sanford", jobTitle: "UI/UX Designer", location: "Dubai", imgSrc: profile_img },
-    { _id: 5, name: "Enrique Murphy", jobTitle: "Full Stack Developer", location: "Hyderabad", imgSrc: profile_img },
-    { _id: 6, name: "Alison Powell", jobTitle: "Data Scientist", location: "New Delhi", imgSrc: profile_img },
-    { _id: 7, name: "Richard Sanford", jobTitle: "Marketing Manager", location: "Chennai", imgSrc: profile_img },
+    {
+        userId: "U001",
+        jobId: "J101",
+        _id: 1,
+        name: "Richard Sanford",
+        jobTitle: "Full Stack Developer",
+        location: "Bangalore",
+        imgSrc: profile_img,
+        gender: "Male",
+        maritalStatus: "Single",
+        nationality: "Indian",
+        aadhaarNumber: "1234-5678-9012",
+        phoneNumber: "+91 9876543210",
+        email: "richard.sanford@example.com",
+        permanentAddress: {
+            street: "123 Main Street",
+            city: "Bangalore",
+            state: "Karnataka",
+            pinCode: "560001"
+        },
+        currentAddress: {
+            street: "456 Residency Road",
+            city: "Bangalore",
+            state: "Karnataka",
+            pinCode: "560002"
+        },
+        education: {
+            tenth: { board: "CBSE", year: 2015, percentage: "85%" },
+            twelfth: { board: "CBSE", year: 2017, percentage: "88%" },
+            graduation: {
+                degree: "B.Tech",
+                university: "IIT Delhi",
+                yearOfGraduation: 2021,
+                specialization: "Computer Science",
+                cgpa: "9.2"
+            },
+            certifications: ["AWS Certified Developer", "Full-Stack Web Development"]
+        },
+        experience: "3 years"
+    },
+    {
+        userId: "U002",
+        jobId: "J102",
+        _id: 2,
+        name: "Enrique Murphy",
+        jobTitle: "Data Scientist",
+        location: "San Francisco",
+        imgSrc: profile_img,
+        gender: "Male",
+        maritalStatus: "Married",
+        nationality: "American",
+        aadhaarNumber: "",
+        phoneNumber: "+1 1234567890",
+        email: "enrique.murphy@example.com",
+        permanentAddress: {
+            street: "789 Silicon Valley",
+            city: "San Francisco",
+            state: "California",
+            pinCode: "94107"
+        },
+        currentAddress: {
+            street: "789 Silicon Valley",
+            city: "San Francisco",
+            state: "California",
+            pinCode: "94107"
+        },
+        education: {
+            tenth: { board: "US Board", year: 2013, percentage: "90%" },
+            twelfth: { board: "US Board", year: 2015, percentage: "92%" },
+            graduation: {
+                degree: "M.Sc",
+                university: "Stanford University",
+                yearOfGraduation: 2019,
+                specialization: "Data Science",
+                cgpa: "3.8"
+            },
+            certifications: ["TensorFlow Developer Certificate", "Data Science with Python"]
+        },
+        experience: "5 years"
+    },
+    {
+        userId: "U003",
+        jobId: "J103",
+        _id: 3,
+        name: "Alison Powell",
+        jobTitle: "Marketing Manager",
+        location: "London",
+        imgSrc: profile_img,
+        gender: "Female",
+        maritalStatus: "Single",
+        nationality: "British",
+        aadhaarNumber: "",
+        phoneNumber: "+44 9876543210",
+        email: "alison.powell@example.com",
+        permanentAddress: {
+            street: "55 Oxford Street",
+            city: "London",
+            state: "England",
+            pinCode: "W1D 1BS"
+        },
+        currentAddress: {
+            street: "22 Regent Street",
+            city: "London",
+            state: "England",
+            pinCode: "W1B 5TB"
+        },
+        education: {
+            tenth: { board: "UK Board", year: 2012, percentage: "85%" },
+            twelfth: { board: "UK Board", year: 2014, percentage: "87%" },
+            graduation: {
+                degree: "MBA",
+                university: "London Business School",
+                yearOfGraduation: 2018,
+                specialization: "Marketing",
+                cgpa: "3.9"
+            },
+            certifications: ["Google Digital Marketing", "HubSpot Inbound Marketing"]
+        },
+        experience: "6 years"
+    },
+    {
+        userId: "U004",
+        jobId: "J104",
+        _id: 4,
+        name: "Richard Sanford",
+        jobTitle: "UI/UX Designer",
+        location: "Dubai",
+        imgSrc: profile_img,
+        gender: "Male",
+        maritalStatus: "Single",
+        nationality: "Indian",
+        aadhaarNumber: "1234-5678-9012",
+        phoneNumber: "+91 9876543211",
+        email: "richard.ui@example.com",
+        permanentAddress: {
+            street: "789 Design Avenue",
+            city: "Dubai",
+            state: "UAE",
+            pinCode: "000001"
+        },
+        currentAddress: {
+            street: "789 Design Avenue",
+            city: "Dubai",
+            state: "UAE",
+            pinCode: "000001"
+        },
+        education: {
+            tenth: { board: "CBSE", year: 2015, percentage: "87%" },
+            twelfth: { board: "CBSE", year: 2017, percentage: "89%" },
+            graduation: {
+                degree: "B.Des",
+                university: "National Institute of Design",
+                yearOfGraduation: 2021,
+                specialization: "UI/UX Design",
+                cgpa: "9.1"
+            },
+            certifications: ["Adobe XD Certification", "Google UX Design"]
+        },
+        experience: "4 years"
+    }
 ];
 
 export const jobsData = [

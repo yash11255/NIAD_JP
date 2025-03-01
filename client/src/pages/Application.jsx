@@ -8,6 +8,7 @@ import Footer from "../Components/Footer";
 const Application = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [resume, setResume] = useState(null);
+  const [lookingForJob, setLookingForJob] = useState(false); // New toggle state
 
   const handleResumeChange = (event) => {
     const file = event.target.files[0];
@@ -26,63 +27,88 @@ const Application = () => {
     <>
       <Navbar />
       <div className="container mx-auto px-4 md:px-10 lg:px-20 my-10 min-h-[70vh]">
-        {/* Resume Section */}
+        
+        {/* Resume & Job Search Toggle Section */}
         <div className="bg-white shadow-lg rounded-lg p-6 mb-8 border border-gray-200">
-          <h2 className="text-2xl font-semibold text-gray-900">Your Resume</h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Upload and manage your resume for job applications.
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            
+            {/* Resume Section */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">Your Resume</h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Upload and manage your resume for job applications.
+              </p>
 
-          <div className="flex flex-col md:flex-row gap-4 items-center mt-4">
-            {isEdit ? (
-              <>
-                <label
-                  htmlFor="resume-upload"
-                  className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-blue-700 transition"
-                >
-                  <FaUpload className="text-lg" /> Select Resume
-                </label>
-                <input
-                  id="resume-upload"
-                  type="file"
-                  accept="application/pdf"
-                  className="hidden"
-                  onChange={handleResumeChange}
-                />
-                {resume && (
-                  <p className="text-gray-700 text-sm truncate w-48">
-                    {resume}
-                  </p>
-                )}
-                {resume && (
-                  <button
-                    onClick={handleSave}
-                    className="bg-green-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-green-700 transition"
-                  >
-                    Save
-                  </button>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center gap-4">
-                {resume ? (
-                  <a
-                    href="#"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-blue-700 transition"
-                  >
-                    {resume}
-                  </a>
+              <div className="flex flex-col md:flex-row gap-4 items-center mt-4">
+                {isEdit ? (
+                  <>
+                    <label
+                      htmlFor="resume-upload"
+                      className="cursor-pointer flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-blue-700 transition"
+                    >
+                      <FaUpload className="text-lg" /> Select Resume
+                    </label>
+                    <input
+                      id="resume-upload"
+                      type="file"
+                      accept="application/pdf"
+                      className="hidden"
+                      onChange={handleResumeChange}
+                    />
+                    {resume && (
+                      <p className="text-gray-700 text-sm truncate w-48">
+                        {resume}
+                      </p>
+                    )}
+                    {resume && (
+                      <button
+                        onClick={handleSave}
+                        className="bg-green-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-green-700 transition"
+                      >
+                        Save
+                      </button>
+                    )}
+                  </>
                 ) : (
-                  <p className="text-gray-500">No resume uploaded</p>
+                  <div className="flex items-center gap-4">
+                    {resume ? (
+                      <a
+                        href="#"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium shadow-md hover:bg-blue-700 transition"
+                      >
+                        {resume}
+                      </a>
+                    ) : (
+                      <p className="text-gray-500">No resume uploaded</p>
+                    )}
+                    <button
+                      onClick={() => setIsEdit(true)}
+                      className="text-gray-600 border border-gray-300 rounded-md px-4 py-2 font-medium shadow-md hover:bg-gray-100 transition"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 )}
-                <button
-                  onClick={() => setIsEdit(true)}
-                  className="text-gray-600 border border-gray-300 rounded-md px-4 py-2 font-medium shadow-md hover:bg-gray-100 transition"
-                >
-                  Edit
-                </button>
               </div>
-            )}
+            </div>
+
+            {/* Looking for Job Toggle */}
+            <div className="flex items-center gap-3 mt-6 md:mt-0">
+              <p className="text-gray-700 font-medium">Looking for a Job?</p>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={lookingForJob}
+                  onChange={() => setLookingForJob(!lookingForJob)}
+                />
+                <div className="w-12 h-6 bg-gray-300 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+              </label>
+              <span className={`text-sm font-medium ${lookingForJob ? "text-green-600" : "text-gray-500"}`}>
+                {lookingForJob ? "Yes" : "No"}
+              </span>
+            </div>
+
           </div>
         </div>
 
