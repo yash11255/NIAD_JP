@@ -1,52 +1,93 @@
-import React, { useState } from 'react'
-import { assets } from '../assets/assets'
+import React, { useState } from "react";
+import { assets } from "../assets/assets";
 
-const RecruiterLogin = () => {
-    
-   const [state, setState] = useState('login')
-   const [name,setName] = useState('')
-   const [password,setPasword] = useState('')
-   const [email,setEmail] = useState('')
-   const [image,setImage] = useState(false)
-   const [isTextDataSimbited,setIsTextDataSumbited] = useState(false)
+const RecruiterLogin = ({ isOpen, onClose }) => {
+  const [state, setState] = useState("login");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
 
+  if (!isOpen) return null;
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
-
-
-
-   
   return (
-    <div className='absolute top-0 left-0 right-0 bottom-0 z-10 backdrop-blur-sm bg=black/30 flex justify-center items-center'>
-        <form action="">
-            <h1>Recruiter {state}</h1>
-            <p> Welcome Back Pls sign in to countibue</p>
-            <>
-            <div>
-                <img src={assets.person_icon} />
-                <input onChange={e => setName(e.target.value)} value={name} type="text"  placeholder='Company name' required/>
+    <div
+      className="absolute top-0 left-0 right-0 bottom-0 z-10 
+                 backdrop-blur-sm bg-black/30 
+                 flex justify-center items-center"
+      onClick={handleBackdropClick}
+    >
+      <form
+        className="bg-white p-6 rounded shadow"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h1 className="text-xl mb-2">Recruiter {state}</h1>
+        <p className="mb-4">Welcome Back! Please sign in to continue</p>
 
-            </div>
-            <div>
-                <img src={assets.email_icon} />
-                <input onChange={e => setEmail(e.target.value)} value={email} type="email"  placeholder='email id' required/>
+        {/* Company Name */}
+        <div className="mb-4 flex items-center">
+          <img src={assets.person_icon} alt="person icon" className="mr-2" />
+          <input
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+            type="text"
+            placeholder="Company name"
+            required
+            className="border p-2 flex-1"
+          />
+        </div>
 
-            </div> 
-            <div>
-                <img src={assets.lock_icon} />
-                <input onChange={e => setName(e.target.value)} value={password} type="password"  placeholder='Password' required/>
+        {/* Email */}
+        <div className="mb-4 flex items-center">
+          <img src={assets.email_icon} alt="email icon" className="mr-2" />
+          <input
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            type="email"
+            placeholder="Email ID"
+            required
+            className="border p-2 flex-1"
+          />
+        </div>
 
-            </div>
+        {/* Password */}
+        <div className="mb-4 flex items-center">
+          <img src={assets.lock_icon} alt="lock icon" className="mr-2" />
+          <input
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            type="password"
+            placeholder="Password"
+            required
+            className="border p-2 flex-1"
+          />
+        </div>
 
-            </>
-            <button>
-                {state == 'login' ? 'login' : 'create account'}
-            </button>
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
+          >
+            {state === "login" ? "Login" : "Create Account"}
+          </button>
 
-        </form>
-
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-4 text-gray-500 hover:text-gray-800"
+          >
+            Close
+          </button>
+        </div>
+      </form>
     </div>
-  )
-}
+  );
+};
 
-export default RecruiterLogin
+export default RecruiterLogin;
