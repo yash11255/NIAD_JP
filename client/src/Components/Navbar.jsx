@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { assets } from "../assets/assets";
 import { UserButton, useClerk, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi"; // Import icons
+import { FiMenu, FiX } from "react-icons/fi";
+import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
-  const [menuOpen, setMenuOpen] = useState(false); // State for mobile menu
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { setShowRecruiterLogin } = useContext(AppContext);
 
   return (
     <div className="shadow py-4 bg-white">
@@ -27,7 +29,12 @@ const Navbar = () => {
             </>
           ) : (
             <div className="flex gap-4">
-              <button className="text-gray-600">Recruiter Login</button>
+              <button
+                className="text-gray-600"
+                onClick={() => setShowRecruiterLogin(true)}
+              >
+                Recruiter Login
+              </button>
               <button
                 onClick={openSignIn}
                 className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
@@ -38,7 +45,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Icon (Right Aligned) */}
+        {/* Mobile Menu Icon */}
         <div className="md:hidden">
           <button onClick={() => setMenuOpen(true)}>
             <FiMenu className="w-7 h-7" />
@@ -46,14 +53,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu (Sliding from Right) */}
+      {/* Mobile Menu */}
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 p-6`}
       >
-        {/* Close Button (Inside Menu) */}
-        <button onClick={() => setMenuOpen(false)} className="absolute top-4 right-4">
+        {/* Close Button */}
+        <button
+          onClick={() => setMenuOpen(false)}
+          className="absolute top-4 right-4"
+        >
           <FiX className="w-7 h-7" />
         </button>
 
@@ -73,7 +83,13 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <button className="text-gray-600" onClick={() => setMenuOpen(false)}>
+              <button
+                className="text-gray-600"
+                onClick={() => {
+                  setShowRecruiterLogin(true);
+                  setMenuOpen(false);
+                }}
+              >
                 Recruiter Login
               </button>
               <button
