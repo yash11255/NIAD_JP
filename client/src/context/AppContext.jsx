@@ -11,6 +11,10 @@ export const AppContextProvider = (props) => {
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
+  const [companyData, setCompanyData] = useState(null);
+  const [companyToken, setCompanyToken] = useState(null);
+
+  console.log("this is comp token", companyToken);
 
   console.log(showRecruiterLogin);
 
@@ -46,6 +50,8 @@ export const AppContextProvider = (props) => {
     setIsSearched,
     jobs, // Use jobs instead of jobsData
     setJobs,
+    setCompanyData,
+    setCompanyToken,
     showRecruiterLogin,
     setShowRecruiterLogin,
   };

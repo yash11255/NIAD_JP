@@ -3,7 +3,9 @@ import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+
+// Use Vite's environment variable syntax if applicable or process.env for Create React App
+const backendUrl = import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
 
 const RecruiterLogin = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
   const [image, setImage] = useState(null);
   const [isTextDataSubmited, setIsTextDataSubmited] = useState(false);
 
-  const { setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData } =
+  const { setShowRecruiterLogin, setCompanyToken, setCompanyData } =
     useContext(AppContext);
 
   useEffect(() => {
@@ -32,12 +34,14 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // For signup, wait for text fields to be submitted first
     if (state === "signup" && !isTextDataSubmited) {
       return setIsTextDataSubmited(true);
     }
 
     try {
       if (state === "login") {
+        // Login API call
         const { data } = await axios.post(`${backendUrl}/api/company/login`, {
           email,
           password,
@@ -46,13 +50,15 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
         if (data.success) {
           setCompanyData(data.company);
           setCompanyToken(data.token);
-          localStorage.setItem("companyToken", data.token);
+          // localStorage.setItem("companyToken", data.token);
+          alert("Logged in successfully!");
           setShowRecruiterLogin(false);
-          navigate("/dashboard");
+          // navigate("/dashboard");
         } else {
-          toast.error(data.message);
+          alert(data.message);
         }
       } else if (state === "signup") {
+        // Signup API call with image upload using FormData
         const formData = new FormData();
         formData.append("name", name);
         formData.append("password", password);
@@ -61,32 +67,39 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
 
         const { data } = await axios.post(
           `${backendUrl}/api/company/register`,
-          formData
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
 
         if (data.success) {
           setCompanyData(data.company);
           setCompanyToken(data.token);
-          localStorage.setItem("companyToken", data.token);
+          // localStorage.setItem("companyToken", data.token);
+          alert("Account created successfully!");
           setShowRecruiterLogin(false);
-          navigate("/dashboard");
+          // navigate("/dashboard");
         } else {
-          toast.error(data.message);
+          alert(data.message);
         }
       } else if (state === "forgot") {
-        const { data } = await axios.post(`${backendUrl}/api/company/forgot-password`, {
-          email,
-        });
+        // Forgot password API call
+        const { data } = await axios.post(
+          `${backendUrl}/api/company/forgot-password`,
+          { email }
+        );
 
         if (data.success) {
-          toast.success("Password reset link sent to your email!");
+          alert("Password reset link sent to your email!");
           setState("login");
         } else {
-          toast.error(data.message);
+          alert(data.message);
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      console.error("Error in API call:", error);
+      alert(error.response?.data?.message || error.message);
     }
   };
 
@@ -109,7 +122,12 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
 
         {/* Header */}
         <h1 className="text-center text-2xl text-neutral-700 font-medium">
-          Recruiter {state === "login" ? "Login" : state === "signup" ? "Sign Up" : "Reset Password"}
+          Recruiter{" "}
+          {state === "login"
+            ? "Login"
+            : state === "signup"
+            ? "Sign Up"
+            : "Reset Password"}
         </h1>
         <p className="text-sm text-center text-gray-500">
           {state === "login"
@@ -140,12 +158,16 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
         )}
 
         {/* Input Fields */}
-        {!isTextDataSubmited || state !== "signup" ? (
+        {(!isTextDataSubmited || state !== "signup") && (
           <>
             {/* Company Name (Signup) */}
             {state === "signup" && (
               <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.person_icon} alt="Company" className="w-5 h-5" />
+                <img
+                  src={assets.person_icon}
+                  alt="Company"
+                  className="w-5 h-5"
+                />
                 <input
                   className="outline-none text-sm w-full"
                   onChange={(e) => setName(e.target.value)}
@@ -173,7 +195,11 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
             {/* Password (Not for Forgot Password) */}
             {state !== "forgot" && (
               <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-                <img src={assets.lock_icon} alt="Password" className="w-5 h-5" />
+                <img
+                  src={assets.lock_icon}
+                  alt="Password"
+                  className="w-5 h-5"
+                />
                 <input
                   className="outline-none text-sm w-full"
                   onChange={(e) => setPassword(e.target.value)}
@@ -185,7 +211,7 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
               </div>
             )}
           </>
-        ) : null}
+        )}
 
         {/* Forgot Password Link (Login Mode Only) */}
         {state === "login" && (
