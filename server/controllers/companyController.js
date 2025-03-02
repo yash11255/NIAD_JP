@@ -103,37 +103,73 @@ export const getCompanyData = async (req, res) => {
 }
 
 // Post New Job
+// export const postJob = async (req, res) => {
+
+//     const { title, description, location, salary, level, category } = req.body
+
+//     const companyId = req.company._id
+
+//     try {
+
+//         const newJob = new Job({
+//             title,
+//             description,
+//             location,
+//             salary,
+//             companyId,
+//             date: Date.now(),
+//             level,
+//             category
+//         })
+
+//         await newJob.save()
+
+//         res.json({ success: true, newJob })
+
+//     } catch (error) {
+
+//         res.json({ success: false, message: error.message })
+
+//     }
+
+
+// }
+
 export const postJob = async (req, res) => {
+    const { 
+        title, 
+        description, 
+        location, 
+        category, 
+        level, 
+        salary, 
+        visible, 
+        companyDetails 
+    } = req.body;
 
-    const { title, description, location, salary, level, category } = req.body
-
-    const companyId = req.company._id
+    const companyId = req.company._id;
 
     try {
-
         const newJob = new Job({
             title,
             description,
             location,
-            salary,
-            companyId,
-            date: Date.now(),
+            category,
             level,
-            category
-        })
+            salary,
+            date: Date.now(), // Consider changing to `new Date()` if switching to Date type
+            visible: visible ?? true, // Default value
+            companyId,
+            companyDetails
+        });
 
-        await newJob.save()
+        await newJob.save();
 
-        res.json({ success: true, newJob })
-
+        res.json({ success: true, newJob });
     } catch (error) {
-
-        res.json({ success: false, message: error.message })
-
+        res.json({ success: false, message: error.message });
     }
-
-
-}
+};
 
 // Get Company Job Applicants
 export const getCompanyJobApplicants = async (req, res) => {
