@@ -1,27 +1,46 @@
-import jwt from 'jsonwebtoken'
-import Company from '../models/Company.js'
+import jwt from "jsonwebtoken";
+import Company from "../models/Company.js";
 
-// Middleware ( Protect Company Routes )
-export const protectCompany = async (req,res,next) => {
+// Middleware (Protect Company Routes)
+export const protectCompany = async (req, res, next) => {
+  let token;
 
-    // Getting Token Froms Headers
-    const token = req.headers.token
-
-    
-    if (!token) {
-        return res.json({ success:false, message:'Not authorized, Login Again'})
-    }
-
+  // Check if the Authorization header exists and starts with "Bearer"
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
     try {
-        
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      // Extract token (remove "Bearer " prefix)
+      token = req.headers.authorization.split(" ")[1];
 
-        req.company = await Company.findById(decoded.id).select('-password')
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        next()
+      // Find company by ID, exclude password
+      req.company = await Company.findById(decoded.id).select("-password");
 
+      if (!req.company) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Company not found" });
+      }
+
+      next();
     } catch (error) {
-        res.json({success:false, message: error.message})
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Invalid token, authorization failed",
+        });
     }
+  }
 
-}
+  // If no token is found
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Not authorized, Login Again" });
+  }
+};
