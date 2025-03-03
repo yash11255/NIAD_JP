@@ -4,7 +4,6 @@ import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-// Use Vite's environment variable syntax if applicable or process.env for Create React App
 const backendUrl = import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
 
 const RecruiterLogin = ({ isOpen, onClose }) => {

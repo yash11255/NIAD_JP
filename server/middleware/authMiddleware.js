@@ -28,12 +28,10 @@ export const protectCompany = async (req, res, next) => {
 
       next();
     } catch (error) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Invalid token, authorization failed",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token, authorization failed",
+      });
     }
   }
 
@@ -42,5 +40,25 @@ export const protectCompany = async (req, res, next) => {
     return res
       .status(401)
       .json({ success: false, message: "Not authorized, Login Again" });
+  }
+};
+
+export const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = { id: decoded.userId };
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
