@@ -22,7 +22,7 @@ router.post("/user-login", loginUser); //tested
 router.get("/user", authenticate, getUserData); //tested
 
 // Apply for a job
-router.post("/apply", authenticate, applyForJob); //tested
+router.post("/apply/:id", authenticate, applyForJob); //tested
 
 // Get applied jobs data
 router.get("/applications", authenticate, getUserJobApplications); //tested

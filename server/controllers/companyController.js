@@ -192,17 +192,38 @@ export const postJob = async (req, res) => {
 // Get Company Job Applicants
 export const getCompanyJobApplicants = async (req, res) => {
   try {
-    const companyId = req.company;
-    console.log("------>", companyId);
-    // Find job applications for the user and populate related data
-    const applications = await JobApplication.find({ companyId })
+    const companyId = req.company._id.toString();
+    const { jobId } = req.params;
+
+    const filter = { companyId };
+
+    if (jobId) {
+      filter.jobId = jobId;
+
+      // OPTIONAL: Validate that the job exists and belongs to the company
+      const job = await Job.findById(jobId);
+      if (!job) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Job not found" });
+      }
+      if (job.companyId.toString() !== companyId) {
+        return res.status(403).json({
+          success: false,
+          message: "Unauthorized: This job does not belong to your company.",
+        });
+      }
+    }
+
+    // Retrieve job applications matching the filter
+    const applications = await JobApplication.find(filter)
       .populate("userId", "name image resume")
       .populate("jobId", "title location category level salary")
       .exec();
 
     return res.json({ success: true, applications });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 

@@ -147,8 +147,9 @@ export const getUserData = async (req, res) => {
 
 // Apply For Job
 export const applyForJob = async (req, res) => {
-  const { jobId, companyId, ...applicationData } = req.body;
+  const { companyId, ...applicationData } = req.body;
   const userId = req.user.id;
+  const jobId = req.params.id;
 
   try {
     // Check if the job exists
