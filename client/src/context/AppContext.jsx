@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { jobsData } from "../assets/assets";
+import Cookies from "js-cookie"; // ✅ Import js-cookie
 
 export const AppContext = createContext();
 
@@ -12,13 +13,21 @@ export const AppContextProvider = (props) => {
   const [jobs, setJobs] = useState([]);
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
   const [companyData, setCompanyData] = useState(null);
-  const [companyToken, setCompanyToken] = useState(null);
+  const [companyToken, setCompanyTokenState] = useState(Cookies.get("companyToken") || null); // ✅ Read token from cookies
+
+  // ✅ Store token in both state and cookies
+  const setCompanyToken = (token) => {
+    setCompanyTokenState(token);
+    if (token) {
+      Cookies.set("companyToken", token, { expires: 7 }); // Store for 7 days
+    } else {
+      Cookies.remove("companyToken");
+    }
+  };
 
   console.log("this is comp token", companyToken);
 
-  console.log(showRecruiterLogin);
-
-  // Function to fetch and filter job data
+  // ✅ Fetch & filter job data
   useEffect(() => {
     const fetchJobs = () => {
       let filteredJobs = jobsData;
@@ -31,9 +40,7 @@ export const AppContextProvider = (props) => {
 
       if (searchFilter.location) {
         filteredJobs = filteredJobs.filter((job) =>
-          job.location
-            .toLowerCase()
-            .includes(searchFilter.location.toLowerCase())
+          job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
         );
       }
 
@@ -41,17 +48,19 @@ export const AppContextProvider = (props) => {
     };
 
     fetchJobs();
-  }, [searchFilter]); // Re-run filtering when searchFilter changes
+  }, [searchFilter]);
 
   const value = {
     setSearchFilter,
     searchFilter,
     isSearched,
     setIsSearched,
-    jobs, // Use jobs instead of jobsData
+    jobs,
     setJobs,
     setCompanyData,
-    setCompanyToken,
+    companyData,
+    companyToken,
+    setCompanyToken, // ✅ Updated function
     showRecruiterLogin,
     setShowRecruiterLogin,
   };

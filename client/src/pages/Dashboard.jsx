@@ -1,35 +1,63 @@
-import { useContext, useEffect, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { assets } from '../assets/assets'
-import { AppContext } from '../context/AppContext'
+import { useContext, useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
+import Cookies from "js-cookie";
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+    const { companyData, setCompanyData, setCompanyToken } = useContext(AppContext);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768); // Default open for large screens
 
-    const navigate = useNavigate()
-    const { companyData, setCompanyData, setCompanyToken } = useContext(AppContext)
-    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768) // Default open for large screens
+    // ✅ Fetch company data from backend on mount
+    useEffect(() => {
+        const fetchCompanyData = async () => {
+            try {
+                const token = Cookies.get("companyToken") || localStorage.getItem("companyToken");
+                if (!token) {
+                    setCompanyData(null);
+                    return;
+                }
 
-    // Logout function
+                const response = await axios.get("http://localhost:5001/api/company/company", { 
+                    headers: { Authorization: `Bearer ${token}` }, 
+                    withCredentials: true  // ✅ This ensures cookies are included
+                });
+
+                console.log("Company Data Response:", response.data); // ✅ Debugging
+                setCompanyData(response.data);
+            } catch (error) {
+                console.error("Error fetching company data:", error);
+                setCompanyData(null);
+            }
+        };
+
+        fetchCompanyData();
+    }, []);
+
+    // ✅ Logout function
     const logout = () => {
-        setCompanyToken(null)
-        localStorage.removeItem('companyToken')
-        setCompanyData(null)
-        navigate('/')
-    }
+        setCompanyToken(null);
+        Cookies.remove("companyToken");
+        localStorage.removeItem("companyToken");
+        setCompanyData(null);
+        navigate("/");
+    };
 
     useEffect(() => {
         if (companyData) {
-            navigate('/dashboard/manage-jobs')
+            navigate("/dashboard/manage-jobs");
         }
 
-        // Close sidebar on smaller screens
+        // ✅ Close sidebar on smaller screens
         const handleResize = () => {
-            setIsSidebarOpen(window.innerWidth > 768)
-        }
-        window.addEventListener('resize', handleResize)
+            setIsSidebarOpen(window.innerWidth > 768);
+        };
+        window.addEventListener("resize", handleResize);
 
-        return () => window.removeEventListener('resize', handleResize)
-    }, [companyData, navigate])
+        return () => window.removeEventListener("resize", handleResize);
+    }, [companyData, navigate]);
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -112,7 +140,7 @@ const Dashboard = () => {
 
         </div>
     )
-}
+};
 
 /**
  * Sidebar Navigation Item Component
@@ -128,7 +156,7 @@ const SidebarItem = ({ to, icon, label, isSidebarOpen }) => {
             <img className="w-5" src={icon} alt="" />
             {isSidebarOpen && <p className="transition-opacity">{label}</p>}
         </NavLink>
-    )
-}
+    );
+};
 
-export default Dashboard
+export default Dashboard;
