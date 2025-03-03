@@ -3,43 +3,30 @@ import Company from "../models/Company.js";
 
 // Middleware (Protect Company Routes)
 export const protectCompany = async (req, res, next) => {
-  let token;
+  const { token } = req.cookies;
 
-  // Check if the Authorization header exists and starts with "Bearer"
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      // Extract token (remove "Bearer " prefix)
-      token = req.headers.authorization.split(" ")[1];
-
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Find company by ID, exclude password
-      req.company = await Company.findById(decoded.id).select("-password");
-
-      if (!req.company) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Company not found" });
-      }
-
-      next();
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token, authorization failed",
-      });
-    }
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 
-  // If no token is found
-  if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Not authorized, Login Again" });
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.company = await Company.findById(decoded.id).select("-password");
+
+    if (!req.company) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Company not found" });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token, authorization failed",
+    });
   }
 };
 

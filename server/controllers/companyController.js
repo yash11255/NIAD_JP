@@ -26,14 +26,9 @@ export const registerCompany = async (req, res) => {
     return res.json({ success: false, message: "Missing Details" });
   }
 
-  console.log("Received:", name, email, password);
-
   try {
     // Check if company already exists
-    console.log("Checking database for existing company...");
     const companyExists = await Company.findOne({ email }).lean();
-    console.log("Company Exists:", companyExists);
-
     if (companyExists) {
       return res.json({
         success: false,
@@ -45,11 +40,8 @@ export const registerCompany = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
-    // Upload image
-    console.log("Uploading image to Cloudinary...");
+    // Upload image to Cloudinary
     const imageUrl = await uploadToCloudinary(imageFile.buffer);
-
-    console.log("Image uploaded successfully:", imageUrl);
 
     // Create company
     const company = await Company.create({
@@ -57,6 +49,17 @@ export const registerCompany = async (req, res) => {
       email,
       password: hashPassword,
       image: imageUrl,
+    });
+
+    // Generate Token
+    const token = generateToken(company._id);
+
+    // Set token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true, // cannot be accessed by client-side scripts
+      secure: process.env.NODE_ENV === "production", // only send over HTTPS in production
+      sameSite: "strict", // CSRF protection
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
     });
 
     res.json({
@@ -67,10 +70,9 @@ export const registerCompany = async (req, res) => {
         email: company.email,
         image: company.image,
       },
-      token: generateToken(company._id),
+      message: "Company registered successfully",
     });
   } catch (error) {
-    console.error("Error:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -82,7 +84,6 @@ export const loginCompany = async (req, res) => {
   try {
     // Check if the company exists
     const company = await Company.findOne({ email });
-
     if (!company) {
       return res.json({ success: false, message: "Invalid email or password" });
     }
@@ -96,6 +97,14 @@ export const loginCompany = async (req, res) => {
     // Generate Token
     const token = generateToken(company._id);
 
+    // Set token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     res.json({
       success: true,
       company: {
@@ -104,10 +113,8 @@ export const loginCompany = async (req, res) => {
         email: company.email,
         image: company.image,
       },
-      token,
+      message: "Logged in successfully",
     });
-
-    console.log("Generated Token:", token);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -137,7 +144,7 @@ export const postJob = async (req, res) => {
       category,
       level,
       salary,
-      visible = true, // Default value if not provided
+      visible = true,
       companyDetails,
     } = req.body;
 
@@ -185,8 +192,8 @@ export const postJob = async (req, res) => {
 // Get Company Job Applicants
 export const getCompanyJobApplicants = async (req, res) => {
   try {
-    const companyId = req.company._id;
-
+    const companyId = req.company;
+    console.log("------>", companyId);
     // Find job applications for the user and populate related data
     const applications = await JobApplication.find({ companyId })
       .populate("userId", "name image resume")
@@ -202,7 +209,7 @@ export const getCompanyJobApplicants = async (req, res) => {
 // Get Company Posted Jobs
 export const getCompanyPostedJobs = async (req, res) => {
   try {
-    const companyId = req.company._id;
+    const companyId = req.company;
 
     const jobs = await Job.find({ companyId });
 
@@ -224,13 +231,32 @@ export const getCompanyPostedJobs = async (req, res) => {
 export const ChangeJobApplicationsStatus = async (req, res) => {
   try {
     const { id, status } = req.body;
+    const companyId = req.company._id.toString();
 
-    // Find Job application and update status
-    await JobApplication.findOneAndUpdate({ _id: id }, { status });
+    // Find the job application by its ID
+    const jobApplication = await JobApplication.findOne({ _id: id });
+    if (!jobApplication) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Job application not found" });
+    }
+
+    // Check if the job application belongs to the authenticated company
+    if (jobApplication.companyId.toString() !== companyId) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Unauthorized: You are not allowed to update the status of this job application.",
+      });
+    }
+
+    // Update the job application's status
+    jobApplication.status = status;
+    await jobApplication.save();
 
     res.json({ success: true, message: "Status Changed" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -238,19 +264,27 @@ export const ChangeJobApplicationsStatus = async (req, res) => {
 export const changeVisiblity = async (req, res) => {
   try {
     const { id } = req.body;
-
     const companyId = req.company._id;
 
     const job = await Job.findById(id);
-
-    if (companyId.toString() === job.companyId.toString()) {
-      job.visible = !job.visible;
+    if (!job) {
+      return res.status(404).json({ success: false, message: "Job not found" });
     }
 
+    //here i am checking that if this is the authenticated job or not
+    if (companyId.toString() !== job.companyId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Unauthorized: You cannot change the visibility of a job that does not belong to your company.",
+      });
+    }
+
+    job.visible = !job.visible;
     await job.save();
 
     res.json({ success: true, job });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };

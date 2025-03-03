@@ -21,21 +21,21 @@ router.post("/register", upload.single("image"), registerCompany); //tested
 router.post("/login", loginCompany); //tested
 
 // Get company data
-router.get("/company", protectCompany, getCompanyData);
+router.get("/company", protectCompany, getCompanyData); //tested
 
 // Post a job
-router.post("/post-job", protectCompany, postJob);
+router.post("/post-job", protectCompany, postJob); //tested
 
 // Get Applicants Data of Company
-router.get("/applicants", protectCompany, getCompanyJobApplicants);
+router.get("/applicants", protectCompany, getCompanyJobApplicants); //tested
 
 // Get  Company Job List
-router.get("/list-jobs", protectCompany, getCompanyPostedJobs);
+router.get("/list-jobs", protectCompany, getCompanyPostedJobs); //tested
 
 // Change Applcations Status
-router.post("/change-status", protectCompany, ChangeJobApplicationsStatus);
+router.post("/change-status", protectCompany, ChangeJobApplicationsStatus); //tested
 
 // Change Applcations Visiblity
-router.post("/change-visiblity", protectCompany, changeVisiblity);
+router.post("/change-visibility", protectCompany, changeVisiblity); //tested
 
 export default router;

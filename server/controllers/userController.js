@@ -147,23 +147,29 @@ export const getUserData = async (req, res) => {
 
 // Apply For Job
 export const applyForJob = async (req, res) => {
-  // Extract jobId and the rest of the data as applicationData
-  const { jobId, ...applicationData } = req.body;
+  const { jobId, companyId, ...applicationData } = req.body;
   const userId = req.user.id;
 
-  console.log(userId);
-  console.log(userId);
-
   try {
-    // Check if user has already applied for this job
-    const isAlreadyApplied = await JobApplication.find({ jobId, userId });
-    if (isAlreadyApplied.length > 0) {
-      return res.json({ success: false, message: "Already Applied" });
-    }
-
+    // Check if the job exists
     const jobData = await Job.findById(jobId);
     if (!jobData) {
-      return res.json({ success: false, message: "Job Not Found" });
+      return res.status(404).json({ success: false, message: "Job Not Found" });
+    }
+
+    if (companyId && jobData.companyId.toString() !== companyId) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid request: the selected job does not belong to the specified company.",
+      });
+    }
+
+    const isAlreadyApplied = await JobApplication.find({ jobId, userId });
+    if (isAlreadyApplied.length > 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Already Applied" });
     }
 
     // Create a new job application including the detailed form data
@@ -171,13 +177,13 @@ export const applyForJob = async (req, res) => {
       companyId: jobData.companyId,
       userId,
       jobId,
-      applicationData, // Saves all form details from the UI
+      applicationData,
       date: Date.now(),
     });
 
     res.json({ success: true, message: "Applied Successfully" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
