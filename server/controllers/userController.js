@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import streamifier from "streamifier";
 
+//register
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -41,19 +42,28 @@ export const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    // Generate JWT token (make sure JWT_SECRET is defined in your environment variables)
+    // Generate JWT token (expires in 1 day)
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
+    // Set token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true, // Not accessible via client-side scripts
+      secure: process.env.NODE_ENV === "production", // Use HTTPS in production
+      sameSite: "strict", // CSRF protection
+      maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
+    });
+
+    // Respond without including the token in the JSON
     res.status(201).json({
       success: true,
-      token,
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
       },
+      message: "User registered successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -88,27 +98,35 @@ export const loginUser = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    // Generate JWT token
+    // Generate JWT token (expires in 1 day)
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
-    res.json({
+    // Set token as HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // Respond without including the token in the JSON
+    res.status(200).json({
       success: true,
-      token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         image: user.image,
       },
+      message: "Logged in successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Get User Data
 // Get User Data
 export const getUserData = async (req, res) => {
   // Access the user id set by the middleware

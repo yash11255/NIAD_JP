@@ -10,6 +10,7 @@ import connectCloudinary from "./config/cloudinary.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { clerkMiddleware } from "@clerk/express";
+import cookieParser from "cookie-parser";
 
 // Initialize Express
 const app = express();
@@ -23,6 +24,7 @@ app.use(
     },
   })
 );
+app.use(cookieParser());
 
 app.use(clerkMiddleware());
 
