@@ -41,18 +41,21 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
     try {
       if (state === "login") {
         // Login API call
-        const { data } = await axios.post(`${backendUrl}/api/company/login`, {
-          email,
-          password,
-        });
+        const { data } = await axios.post(
+          `${backendUrl}/api/company/login`,
+          {
+            email,
+            password,
+          },
+          { withCredentials: true }
+        );
 
         if (data.success) {
           setCompanyData(data.company);
           setCompanyToken(data.token);
-          // localStorage.setItem("companyToken", data.token);
           alert("Logged in successfully!");
           setShowRecruiterLogin(false);
-          // navigate("/dashboard");
+          navigate("/dashboard");
         } else {
           alert(data.message);
         }
@@ -69,6 +72,7 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
           }
         );
 
