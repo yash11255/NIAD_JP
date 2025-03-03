@@ -15,7 +15,7 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
   const [image, setImage] = useState(null);
   const [isTextDataSubmited, setIsTextDataSubmited] = useState(false);
 
-  const { setShowRecruiterLogin, setCompanyToken, setCompanyData } =
+  const { setShowRecruiterLogin, setIsAuthenticated, setCompanyData } =
     useContext(AppContext);
 
   useEffect(() => {
@@ -49,10 +49,11 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
           },
           { withCredentials: true }
         );
+        console.log(data);
 
         if (data.success) {
           setCompanyData(data.company);
-          setCompanyToken(data.token);
+          setIsAuthenticated(true);
           alert("Logged in successfully!");
           setShowRecruiterLogin(false);
           navigate("/dashboard");
@@ -60,7 +61,6 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
           alert(data.message);
         }
       } else if (state === "signup") {
-        // Signup API call with image upload using FormData
         const formData = new FormData();
         formData.append("name", name);
         formData.append("password", password);
@@ -78,11 +78,8 @@ const RecruiterLogin = ({ isOpen, onClose }) => {
 
         if (data.success) {
           setCompanyData(data.company);
-          setCompanyToken(data.token);
-          // localStorage.setItem("companyToken", data.token);
           alert("Account created successfully!");
           setShowRecruiterLogin(false);
-          // navigate("/dashboard");
         } else {
           alert(data.message);
         }

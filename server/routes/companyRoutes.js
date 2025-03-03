@@ -6,6 +6,7 @@ import {
   getCompanyJobApplicants,
   getCompanyPostedJobs,
   loginCompany,
+  logout,
   postJob,
   registerCompany,
 } from "../controllers/companyController.js";
@@ -37,5 +38,8 @@ router.post("/change-status", protectCompany, ChangeJobApplicationsStatus); //te
 
 // Change Applcations Visiblity
 router.post("/change-visibility", protectCompany, changeVisiblity); //tested -cnf
+
+//logout
+router.post("/logout", protectCompany, logout);
 
 export default router;

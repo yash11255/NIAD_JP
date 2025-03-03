@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { jobsData } from "../assets/assets";
-import Cookies from "js-cookie"; // ✅ Import js-cookie
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export const AppContext = createContext();
 
@@ -13,21 +14,55 @@ export const AppContextProvider = (props) => {
   const [jobs, setJobs] = useState([]);
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
   const [companyData, setCompanyData] = useState(null);
-  const [companyToken, setCompanyTokenState] = useState(Cookies.get("companyToken") || null); // ✅ Read token from cookies
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  console.log("--->", isAuthenticated);
 
-  // ✅ Store token in both state and cookies
-  const setCompanyToken = (token) => {
-    setCompanyTokenState(token);
-    if (token) {
-      Cookies.set("companyToken", token, { expires: 7 }); // Store for 7 days
-    } else {
-      Cookies.remove("companyToken");
+  const backendUrl =
+    import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
+
+  //central authentication check for company
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const { data } = await axios.get(`${backendUrl}/api/company/company`, {
+          withCredentials: true,
+        });
+
+        if (data.success) {
+          setCompanyData(data.company);
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          setCompanyData(null);
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
+        setCompanyData(null);
+        console.error("Authentication check failed:", error);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  //logout company fucntionality
+  const logout = async () => {
+    try {
+      await axios.post(
+        `${backendUrl}/api/company/logout`,
+        {},
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
+
+    Cookies.remove("token");
+    localStorage.removeItem("token");
+    setCompanyData(null);
+    setIsAuthenticated(false);
   };
 
-  console.log("this is comp token", companyToken);
-
-  // ✅ Fetch & filter job data
   useEffect(() => {
     const fetchJobs = () => {
       let filteredJobs = jobsData;
@@ -40,7 +75,9 @@ export const AppContextProvider = (props) => {
 
       if (searchFilter.location) {
         filteredJobs = filteredJobs.filter((job) =>
-          job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
+          job.location
+            .toLowerCase()
+            .includes(searchFilter.location.toLowerCase())
         );
       }
 
@@ -58,11 +95,12 @@ export const AppContextProvider = (props) => {
     jobs,
     setJobs,
     setCompanyData,
+    isAuthenticated,
+    setIsAuthenticated,
     companyData,
-    companyToken,
-    setCompanyToken, // ✅ Updated function
     showRecruiterLogin,
     setShowRecruiterLogin,
+    logout,
   };
 
   return (

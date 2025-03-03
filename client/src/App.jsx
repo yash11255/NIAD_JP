@@ -11,13 +11,14 @@ import ManageJobs from "./pages/ManageJobs";
 import ViewApplications from "./pages/ViewApplications";
 import "quill/dist/quill.snow.css";
 import ApplyJobForm from "./pages/ApplyJobForm";
+import PrivateRoute from "./Routes/PrivateRoute.jsx";
 
 const App = () => {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
-  // console.log("fro app", showRecruiterLogin);
+
   return (
     <div>
-      {/* Recruiter Login Popup should only render when needed */}
+      {/* Recruiter Login Popup */}
       {showRecruiterLogin && (
         <RecruiterLogin
           isOpen={showRecruiterLogin}
@@ -31,10 +32,14 @@ const App = () => {
         <Route path="/application" element={<Application />} />
         <Route path="/apply-job/:id" element={<ApplyJob />} />
         <Route path="/apply-job-form" element={<ApplyJobForm />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="add-job" element={<AddJobs />} />
-          <Route path="manage-jobs" element={<ManageJobs />} />
-          <Route path="view-applications" element={<ViewApplications />} />
+
+        {/* ✅ Protected recruiter routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="add-job" element={<AddJobs />} />
+            <Route path="manage-jobs" element={<ManageJobs />} />
+            <Route path="view-applications" element={<ViewApplications />} />
+          </Route>
         </Route>
       </Routes>
     </div>
