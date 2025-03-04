@@ -1,11 +1,15 @@
-import React, { useState } from "react";
-import { manageJobsData } from "../assets/assets";
+import React, { useContext, useEffect } from "react";
+import { AppContext } from "../context/AppContext";
 import { Eye, EyeOff, Users, Briefcase } from "lucide-react";
 
 const ManageJobs = () => {
-  const [jobs, setJobs] = useState(manageJobsData);
+  const { jobs, setJobs, fetchCompanyJobs } = useContext(AppContext);
 
-  // Function to toggle job visibility
+  // Fetch jobs
+  useEffect(() => {
+    fetchCompanyJobs();
+  }, []);
+
   const toggleVisibility = (id) => {
     setJobs((prevJobs) =>
       prevJobs.map((job) =>
@@ -26,7 +30,9 @@ const ManageJobs = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white shadow-lg rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700">Total Job Openings</h3>
+            <h3 className="text-lg font-semibold text-gray-700">
+              Total Job Openings
+            </h3>
             <p className="text-3xl font-bold text-blue-600">{totalJobs}</p>
           </div>
           <Briefcase className="h-10 w-10 text-gray-500" />
@@ -34,16 +40,24 @@ const ManageJobs = () => {
 
         <div className="bg-white shadow-lg rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700">Total Applicants</h3>
-            <p className="text-3xl font-bold text-green-600">{totalApplicants}</p>
+            <h3 className="text-lg font-semibold text-gray-700">
+              Total Applicants
+            </h3>
+            <p className="text-3xl font-bold text-green-600">
+              {totalApplicants}
+            </p>
           </div>
           <Users className="h-10 w-10 text-gray-500" />
         </div>
 
         <div className="bg-white shadow-lg rounded-lg p-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700">Visible / Hidden Jobs</h3>
-            <p className="text-3xl font-bold text-orange-600">{visibleJobs} / {hiddenJobs}</p>
+            <h3 className="text-lg font-semibold text-gray-700">
+              Visible / Hidden Jobs
+            </h3>
+            <p className="text-3xl font-bold text-orange-600">
+              {visibleJobs} / {hiddenJobs}
+            </p>
           </div>
           <Eye className="h-10 w-10 text-gray-500" />
         </div>
@@ -65,15 +79,28 @@ const ManageJobs = () => {
           </thead>
           <tbody>
             {jobs.map((job) => (
-              <tr key={job._id} className="border-t border-gray-200 hover:bg-gray-50 transition">
+              <tr
+                key={job._id}
+                className="border-t border-gray-200 hover:bg-gray-50 transition"
+              >
                 <td className="px-5 py-4 text-gray-700">{job._id}</td>
-                <td className="px-5 py-4 font-medium text-gray-900">{job.title}</td>
+                <td className="px-5 py-4 font-medium text-gray-900">
+                  {job.title}
+                </td>
                 <td className="px-5 py-4 text-gray-600">
                   {new Date(job.date).toLocaleDateString()}
                 </td>
-                <td className="px-5 py-4 text-center font-semibold text-blue-600">{job.applicants}</td>
+                <td className="px-5 py-4 text-center font-semibold text-blue-600">
+                  {job.applicants}
+                </td>
                 <td className="px-5 py-4 text-center">
-                  <span className={`px-3 py-1 text-xs font-semibold rounded-full ${job.visible ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                  <span
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                      job.visible
+                        ? "bg-green-200 text-green-800"
+                        : "bg-red-200 text-red-800"
+                    }`}
+                  >
                     {job.visible ? "Visible" : "Hidden"}
                   </span>
                 </td>

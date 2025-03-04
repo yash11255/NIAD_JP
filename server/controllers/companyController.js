@@ -134,6 +134,7 @@ export const getCompanyData = async (req, res) => {
   }
 };
 
+// add a job
 export const postJob = async (req, res) => {
   try {
     // Destructure required fields from request body

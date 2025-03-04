@@ -10,7 +10,7 @@ const Dashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    if (companyData) {
+    if (companyData && window.location.pathname === "/dashboard") {
       navigate("/dashboard/manage-jobs");
     }
 

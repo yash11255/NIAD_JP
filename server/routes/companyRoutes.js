@@ -16,30 +16,30 @@ import { protectCompany } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // Register a company
-router.post("/register", upload.single("image"), registerCompany); //tested - cnf
+router.post("/register", upload.single("image"), registerCompany); //tested - integrated
 
 // Company login
-router.post("/login", loginCompany); //tested - cnf
+router.post("/login", loginCompany); //tested - integrated
 
 // Get company data
-router.get("/company", protectCompany, getCompanyData); //tested
+router.get("/company", protectCompany, getCompanyData); //tested - integrated
 
 // Post a job
-router.post("/post-job", protectCompany, postJob); //tested - cnf
+router.post("/post-job", protectCompany, postJob); //tested - integrated
 
 // Get Applicants Data of Company
 router.get("/applicants/:jobId", protectCompany, getCompanyJobApplicants); //tested
 
 // Get  Company Job List
-router.get("/list-jobs", protectCompany, getCompanyPostedJobs); //tested-cnf
+router.get("/list-jobs", protectCompany, getCompanyPostedJobs); //tested - integrated
 
 // Change Applcations Status
 router.post("/change-status", protectCompany, ChangeJobApplicationsStatus); //tested
 
 // Change Applcations Visiblity
-router.post("/change-visibility", protectCompany, changeVisiblity); //tested -cnf
+router.post("/change-visibility", protectCompany, changeVisiblity); //tested - Integrated
 
 //logout
-router.post("/logout", protectCompany, logout);
+router.post("/logout", protectCompany, logout); //tested  - integrated
 
 export default router;

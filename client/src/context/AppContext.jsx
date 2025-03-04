@@ -12,6 +12,8 @@ export const AppContextProvider = (props) => {
   });
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [jobApplicants, setJobApplicants] = useState([]);
+  const [selectedJobId, setSelectedJobId] = useState(null);
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
   const [companyData, setCompanyData] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -31,6 +33,7 @@ export const AppContextProvider = (props) => {
         if (data.success) {
           setCompanyData(data.company);
           setIsAuthenticated(true);
+          fetchCompanyJobs();
         } else {
           setIsAuthenticated(false);
           setCompanyData(null);
@@ -44,6 +47,71 @@ export const AppContextProvider = (props) => {
 
     checkAuthStatus();
   }, []);
+
+  //Post Job Function
+  const postJob = async (jobData) => {
+    if (!isAuthenticated || !companyData) {
+      alert("You need to be logged in to post a job.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/company/post-job`,
+        jobData,
+        { withCredentials: true }
+      );
+      console.log("Job added", response);
+      if (response.data.success) {
+        alert("Job posted successfully!");
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error posting job:", error);
+      alert("Failed to post job. Please try again.");
+    }
+  };
+
+  //Fetch Company Jobs
+  const fetchCompanyJobs = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/api/company/list-jobs`, {
+        withCredentials: true,
+      });
+      console.log("this is job listing", response);
+
+      if (response.data.success) {
+        setJobs(response.data.jobsData);
+      } else {
+        console.error("Failed to fetch jobs:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching company jobs:", error);
+    }
+  };
+
+  // Fetch job applicants for a selected job
+  const fetchJobApplicants = async (jobId) => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/company/applicants/${jobId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("applicants,", response);
+
+      if (response.data.success) {
+        setJobApplicants(response.data.applications);
+        setSelectedJobId(jobId);
+      } else {
+        console.error("Failed to fetch applicants:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching job applicants:", error);
+    }
+  };
 
   //logout company fucntionality
   const logout = async () => {
@@ -62,31 +130,9 @@ export const AppContextProvider = (props) => {
     setCompanyData(null);
     setIsAuthenticated(false);
   };
-
   useEffect(() => {
-    const fetchJobs = () => {
-      let filteredJobs = jobsData;
-
-      if (searchFilter.title) {
-        filteredJobs = filteredJobs.filter((job) =>
-          job.title.toLowerCase().includes(searchFilter.title.toLowerCase())
-        );
-      }
-
-      if (searchFilter.location) {
-        filteredJobs = filteredJobs.filter((job) =>
-          job.location
-            .toLowerCase()
-            .includes(searchFilter.location.toLowerCase())
-        );
-      }
-
-      setJobs(filteredJobs);
-    };
-
-    fetchJobs();
-  }, [searchFilter]);
-
+    fetchCompanyJobs(); // Fetch jobs when component mounts
+  }, []);
   const value = {
     setSearchFilter,
     searchFilter,
@@ -101,6 +147,13 @@ export const AppContextProvider = (props) => {
     showRecruiterLogin,
     setShowRecruiterLogin,
     logout,
+    postJob,
+    fetchCompanyJobs,
+    fetchJobApplicants,
+    jobApplicants,
+    setJobApplicants,
+    selectedJobId,
+    setSelectedJobId,
   };
 
   return (
