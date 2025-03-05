@@ -22,10 +22,10 @@ export const AppContextProvider = (props) => {
   // user states
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+  const [isUserAuthenticated, setIsUserAuthenticated] = useState(null);
   const [userApplications, setUserApplications] = useState([]);
-  console.log("applications", userApplications);
-  // console.log("User authentictaion", isUserAuthenticated, userData);
+  // console.log("applications", userApplications);
+  console.log("appcontext user auth", isUserAuthenticated);
 
   const backendUrl =
     import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";

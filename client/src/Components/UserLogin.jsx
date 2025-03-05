@@ -69,9 +69,7 @@ const UserLogin = ({ isOpen, onClose }) => {
           setIsUserAuthenticated(true);
           alert("Account created successfully!");
           setShowUserLogin(false); // CHANGED: Hides modal in global context
-          onClose(); // CHANGED: Automatically closes the modal via prop
-          // Optionally navigate to a protected route:
-          // navigate("/user-dashboard");
+          onClose(); //
         } else {
           alert(data.message);
         }

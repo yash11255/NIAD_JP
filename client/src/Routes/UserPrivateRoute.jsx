@@ -8,11 +8,11 @@ const UserPrivateRoute = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("User authentication status:", isUserAuthenticated);
     if (isUserAuthenticated === false) {
       navigate("/");
     }
   }, [isUserAuthenticated, navigate]);
+  console.log("User authentication status:", isUserAuthenticated);
 
   if (isUserAuthenticated === null) return <p>Loading...</p>;
 

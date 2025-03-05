@@ -30,9 +30,11 @@ const App = () => {
       {/* Page Routes */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/application" element={<Application />} />
-        <Route path="/apply-job/:id" element={<ApplyJob />} />
-        <Route path="/apply-job-form/:id" element={<ApplyJobForm />} />
+        <Route element={<UserPrivateRoute />}>
+          <Route path="/application" element={<Application />} />
+          <Route path="/apply-job/:id" element={<ApplyJob />} />
+          <Route path="/apply-job-form/:id" element={<ApplyJobForm />} />
+        </Route>
 
         {/* ✅ Protected recruiter routes */}
         <Route element={<PrivateRoute />}>
