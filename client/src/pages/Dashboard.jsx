@@ -42,7 +42,11 @@ const Dashboard = () => {
         />
 
         {companyData && (
-          <div className="relative">
+          <div className="relative flex items-center gap-2">
+            {/* Company Name */}
+            <span className="font-medium text-gray-700">
+              {companyData.name}
+            </span>
             {/* ✅ Company Profile Image */}
             <img
               className="w-10 h-10 border rounded-full cursor-pointer object-cover"
