@@ -4,6 +4,7 @@ import {
   getUserData,
   getUserJobApplications,
   loginUser,
+  logout,
   registerUser,
   updateUserResume,
 } from "../controllers/userController.js";
@@ -34,5 +35,8 @@ router.post(
   upload.single("resume"),
   updateUserResume
 ); //tested
+
+//logout user
+router.post("/user-logout", logout);
 
 export default router;

@@ -13,6 +13,7 @@ export const AppContextProvider = (props) => {
   const [isSearched, setIsSearched] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [jobApplicants, setJobApplicants] = useState([]);
+  const [jobAppData, setJobAppData] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
   const [companyData, setCompanyData] = useState(null);
@@ -25,7 +26,7 @@ export const AppContextProvider = (props) => {
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(null);
   const [userApplications, setUserApplications] = useState([]);
   // console.log("applications", userApplications);
-  console.log("appcontext user auth", isUserAuthenticated);
+  // console.log("appcontext user auth", isUserAuthenticated);
 
   const backendUrl =
     import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
@@ -37,6 +38,7 @@ export const AppContextProvider = (props) => {
         const { data } = await axios.get(`${backendUrl}/api/company/company`, {
           withCredentials: true,
         });
+        // console.log("check comp auth");
 
         if (data.success) {
           setCompanyData(data.company);
@@ -63,7 +65,7 @@ export const AppContextProvider = (props) => {
         const { data } = await axios.get(`${backendUrl}/api/users/user`, {
           withCredentials: true,
         });
-        // console.log("Auth check response:", data);
+        // console.log("user auth api");
 
         if (data.success) {
           setUserData(data.user);
@@ -134,10 +136,11 @@ export const AppContextProvider = (props) => {
           withCredentials: true,
         }
       );
-      console.log("applicants,", response);
+      console.log("applicants", response.data);
 
       if (response.data.success) {
         setJobApplicants(response.data.applications);
+        setJobAppData(response.data);
         setSelectedJobId(jobId);
       } else {
         // console.error("Failed to fetch applicants:", response.data.message);
@@ -242,6 +245,22 @@ export const AppContextProvider = (props) => {
     setCompanyData(null);
     setIsAuthenticated(false);
   };
+  const userlogout = async () => {
+    try {
+      await axios.post(
+        `${backendUrl}/api/users/user-logout`,
+        {},
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+
+    Cookies.remove("token");
+    localStorage.removeItem("token");
+    setUserData(null);
+    setIsUserAuthenticated(false);
+  };
 
   // universal job and companies fetch fucntion
   useEffect(() => {
@@ -305,6 +324,7 @@ export const AppContextProvider = (props) => {
     showRecruiterLogin,
     setShowRecruiterLogin,
     logout,
+    userlogout,
     postJob,
     fetchCompanyJobs,
     fetchJobApplicants,
@@ -323,6 +343,8 @@ export const AppContextProvider = (props) => {
     fetchUserJobApplications,
     updateUserResume,
     applyForJob,
+    jobAppData,
+    setJobAppData,
   };
 
   return (

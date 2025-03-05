@@ -212,7 +212,6 @@ export const getUserJobApplications = async (req, res) => {
 };
 
 // Update User Resume
-// controllers/userController.js
 export const updateUserResume = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -252,5 +251,24 @@ export const updateUserResume = async (req, res) => {
     return res.json({ success: true, message: "Resume Updated" });
   } catch (error) {
     return res.json({ success: false, message: error.message });
+  }
+};
+
+//logout user
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error during logout" });
   }
 };

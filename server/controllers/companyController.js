@@ -222,7 +222,18 @@ export const getCompanyJobApplicants = async (req, res) => {
       .populate("jobId", "title location category level salary")
       .exec();
 
-    return res.json({ success: true, applications });
+    // Normalize the applicationData field
+    const normalizedApplications = applications.map((app) => {
+      // Convert Mongoose document to plain object
+      const appObj = app.toObject();
+      // Check if there is an extra nesting layer
+      if (appObj.applicationData && appObj.applicationData.applicationData) {
+        appObj.applicationData = appObj.applicationData.applicationData;
+      }
+      return appObj;
+    });
+
+    return res.json({ success: true, applications: normalizedApplications });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

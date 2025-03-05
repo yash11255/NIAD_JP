@@ -12,7 +12,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Use userData and isUserAuthenticated from AppContext instead of Clerk's hook
-  const { userData, isUserAuthenticated, setShowRecruiterLogin, logoutUser } =
+  const { userData, isUserAuthenticated, setShowRecruiterLogin, userlogout } =
     useContext(AppContext);
 
   return (
@@ -37,7 +37,7 @@ const Navbar = () => {
                   Welcome, {userData?.firstName || userData?.name || "User"}
                 </p>
                 <button
-                  onClick={logoutUser}
+                  onClick={userlogout}
                   className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
                 >
                   Logout
@@ -99,7 +99,7 @@ const Navbar = () => {
                 </p>
                 <button
                   onClick={() => {
-                    logoutUser();
+                    userlogout();
                     setMenuOpen(false);
                   }}
                   className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
