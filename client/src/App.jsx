@@ -13,6 +13,7 @@ import "quill/dist/quill.snow.css";
 import ApplyJobForm from "./pages/ApplyJobForm";
 import PrivateRoute from "./Routes/PrivateRoute.jsx";
 import UserPrivateRoute from "./Routes/UserPrivateRoute.jsx";
+import RecruiterPublicRoute from "./Routes/RecruiterPublicRoute.jsx";
 
 const App = () => {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
@@ -29,7 +30,10 @@ const App = () => {
 
       {/* Page Routes */}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route element={<RecruiterPublicRoute />}>
+          <Route path="/" element={<Home />} />
+        </Route>
+
         <Route element={<UserPrivateRoute />}>
           <Route path="/application" element={<Application />} />
           <Route path="/apply-job/:id" element={<ApplyJob />} />
