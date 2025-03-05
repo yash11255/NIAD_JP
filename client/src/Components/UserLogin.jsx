@@ -13,18 +13,21 @@ const UserLogin = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const { setShowRecruiterLogin, setCompanyToken, setCompanyData } =
+  // Using user-specific state setters from AppContext
+  const { setShowUserLogin, setUserData, setIsUserAuthenticated } =
     useContext(AppContext);
 
   useEffect(() => {
     // Prevent scrolling when modal is open
     document.body.style.overflow = isOpen ? "hidden" : "unset";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {
-    // Close modal if user clicks on backdrop
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -35,46 +38,49 @@ const UserLogin = ({ isOpen, onClose }) => {
 
     try {
       if (state === "login") {
-        // Login API call
-        const { data } = await axios.post(`${backendUrl}/api/company/login`, {
-          email,
-          password,
-        });
+        // User Login API call
+        const { data } = await axios.post(
+          `${backendUrl}/api/users/user-login`,
+          { email, password },
+          { withCredentials: true }
+        );
 
         if (data.success) {
-          setCompanyData(data.company);
-          setCompanyToken(data.token);
+          setUserData(data.user);
+          setIsUserAuthenticated(true);
           alert("Logged in successfully!");
-          setShowRecruiterLogin(false);
-          // navigate("/dashboard");
+          setShowUserLogin(false); // CHANGED: Hides modal in global context
+          onClose(); // CHANGED: Automatically closes the modal via prop
+          // Optionally navigate to a protected user dashboard:
+          // navigate("/user-dashboard");
         } else {
           alert(data.message);
         }
       } else if (state === "signup") {
-        // Signup API call (no file upload, just name/email/password)
+        // User Signup API call (no file upload needed)
         const { data } = await axios.post(
-          `${backendUrl}/api/company/register`,
-          {
-            name,
-            email,
-            password,
-          }
+          `${backendUrl}/api/users/user-register`,
+          { name, email, password },
+          { withCredentials: true }
         );
 
         if (data.success) {
-          setCompanyData(data.company);
-          setCompanyToken(data.token);
+          setUserData(data.user);
+          setIsUserAuthenticated(true);
           alert("Account created successfully!");
-          setShowRecruiterLogin(false);
-          // navigate("/dashboard");
+          setShowUserLogin(false); // CHANGED: Hides modal in global context
+          onClose(); // CHANGED: Automatically closes the modal via prop
+          // Optionally navigate to a protected route:
+          // navigate("/user-dashboard");
         } else {
           alert(data.message);
         }
       } else if (state === "forgot") {
-        // Forgot password API call
+        // Forgot Password API call for user
         const { data } = await axios.post(
-          `${backendUrl}/api/company/forgot-password`,
-          { email }
+          `${backendUrl}/api/user/forgot-password`,
+          { email },
+          { withCredentials: true }
         );
 
         if (data.success) {
@@ -124,7 +130,7 @@ const UserLogin = ({ isOpen, onClose }) => {
             : "Enter your email to reset your password"}
         </p>
 
-        {/* Fields */}
+        {/* Name field (Signup only) */}
         {state === "signup" && (
           <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
             <img src={assets.person_icon} alt="Name" className="w-5 h-5" />
@@ -139,22 +145,20 @@ const UserLogin = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Email */}
-        {(state === "login" || state === "signup" || state === "forgot") && (
-          <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
-            <img src={assets.email_icon} alt="Email" className="w-5 h-5" />
-            <input
-              className="outline-none text-sm w-full"
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-              type="email"
-              placeholder="Email"
-              required
-            />
-          </div>
-        )}
+        {/* Email field */}
+        <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
+          <img src={assets.email_icon} alt="Email" className="w-5 h-5" />
+          <input
+            className="outline-none text-sm w-full"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            type="email"
+            placeholder="Email"
+            required
+          />
+        </div>
 
-        {/* Password (Hide if forgot) */}
+        {/* Password field (hidden for forgot password) */}
         {state !== "forgot" && (
           <div className="border px-4 py-2 flex items-center gap-2 rounded-full mt-5">
             <img src={assets.lock_icon} alt="Password" className="w-5 h-5" />
@@ -169,7 +173,7 @@ const UserLogin = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Forgot Password Link (Login mode only) */}
+        {/* Forgot Password Link (only in login mode) */}
         {state === "login" && (
           <p
             className="text-sm text-blue-600 mt-4 cursor-pointer text-right"

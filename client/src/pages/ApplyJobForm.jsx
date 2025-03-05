@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import Navbar from "../Components/Navbar";
+import { AppContext } from "../context/AppContext";
 
-const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
+const ApplyJobForm = ({ jobTitle, onCancel }) => {
+  const { id: jobId } = useParams();
+  const navigate = useNavigate();
+  const { applyForJob } = useContext(AppContext);
+
   const [formData, setFormData] = useState({
-    // Existing fields
+    // Personal Information
     name: "",
     dateOfBirth: "",
     fathersName: "",
@@ -19,53 +25,26 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     phoneNumber: "",
     email: "",
     experience: 0,
-
     // Education
     education: {
-      tenth: {
-        board: "",
-        year: 0,
-        percentage: 0,
-      },
-      twelfth: {
-        board: "",
-        year: 0,
-        percentage: 0,
-      },
-      graduation: {
-        degree: "",
-        university: "",
-        yearOfGraduation: 0,
-        cgpa: 0,
-      },
-      certifications: [""],
+      tenth: { board: "", year: 0, percentage: 0 },
+      twelfth: { board: "", year: 0, percentage: 0 },
+      graduation: { degree: "", university: "", yearOfGraduation: 0, cgpa: 0 },
+      certifications: [],
     },
-
     // Address
-    permanentAddress: {
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-    },
-    currentAddress: {
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-    },
+    permanentAddress: { street: "", city: "", state: "", pincode: "" },
+    currentAddress: { street: "", city: "", state: "", pincode: "" },
     sameAsPermAddress: false,
-
-    // NEW: Apprenticeship
+    // Apprenticeship
     apprenticeship: {
-      hasApprenticeship: "No", // "Yes" or "No"
+      hasApprenticeship: "No",
       companyName: "",
       tenure: "",
       salaryStipend: "",
       location: "",
     },
-
-    // NEW: Work Experiences (array to hold multiple experiences)
+    // Work Experiences
     workExperiences: [
       {
         companyName: "",
@@ -76,14 +55,11 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
       },
     ],
   });
-
   const [certificationInput, setCertificationInput] = useState("");
 
-  // Handle general changes for top-level keys or nested (like permanentAddress)
+  // Handle changes for top-level or nested fields (e.g., permanentAddress)
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // If "section.field" => handle nested
     if (name.includes(".")) {
       const [section, field] = name.split(".");
       setFormData((prev) => ({
@@ -123,7 +99,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  // Handle changes for addresses
+  // Handle changes for address fields
   const handleAddressChange = (e, addressType) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -135,7 +111,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  // Handle checkbox for same as permanent address
+  // Handle checkbox for "Same as Permanent Address"
   const handleSameAddressChange = (e) => {
     const checked = e.target.checked;
     setFormData((prev) => ({
@@ -147,7 +123,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  // Handle certification array
+  // Handle certification array input
   const handleAddCertification = () => {
     if (certificationInput.trim()) {
       setFormData((prev) => ({
@@ -176,7 +152,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  // NEW: Handle apprenticeship changes
+  // Handle apprenticeship changes
   const handleApprenticeshipChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -188,7 +164,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  // NEW: Work Experience handlers
+  // Handle work experience changes
   const handleWorkExperienceChange = (e, index) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -227,9 +203,16 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submission and apply for job
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const result = await applyForJob(jobId, formData);
+    if (result.success) {
+      alert("Applied Successfully");
+      navigate("/"); // Redirect as desired
+    } else {
+      alert(result.message);
+    }
   };
 
   return (
@@ -248,15 +231,13 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
             Apply for {jobTitle}
           </h2>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Personal Information */}
+          {/* Personal Information Section */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-4 text-blue-700">
               Personal Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name *
@@ -270,8 +251,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Date of Birth */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date of Birth *
@@ -285,8 +264,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Father's Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Father's Name *
@@ -300,8 +277,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email *
@@ -315,8 +290,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Mobile Number */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mobile Number *
@@ -330,8 +303,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Alternative Number */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Alternative Number
@@ -344,8 +315,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Gender */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Gender
@@ -362,8 +331,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   <option value="Other">Other</option>
                 </select>
               </div>
-
-              {/* Marital Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Marital Status
@@ -381,8 +348,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   <option value="Widowed">Widowed</option>
                 </select>
               </div>
-
-              {/* Nationality */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nationality
@@ -395,8 +360,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Aadhaar Number */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Aadhaar Number
@@ -409,8 +372,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Height */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Height (in cm)
@@ -423,8 +384,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Current Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Current Location
@@ -437,8 +396,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-
-              {/* Years of Experience */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Years of Experience
@@ -455,12 +412,11 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {/* Education */}
+          {/* Education Section */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-4 text-blue-700">
               Education
             </h3>
-
             {/* 10th Standard */}
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-2">10th Standard</h4>
@@ -505,7 +461,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 </div>
               </div>
             </div>
-
             {/* 12th Standard */}
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-2">12th Standard</h4>
@@ -550,7 +505,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 </div>
               </div>
             </div>
-
             {/* Graduation */}
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-2">Graduation</h4>
@@ -608,7 +562,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 </div>
               </div>
             </div>
-
             {/* Certifications */}
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Certifications</h4>
@@ -657,12 +610,11 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {/* Address Information */}
+          {/* Address Information Section */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-4 text-blue-700">
               Address Information
             </h3>
-
             {/* Permanent Address */}
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-2">
@@ -719,7 +671,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 </div>
               </div>
             </div>
-
             {/* Current Address */}
             <div>
               <div className="flex items-center mb-2">
@@ -740,7 +691,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   </label>
                 </div>
               </div>
-
               {!formData.sameAsPermAddress && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
@@ -796,13 +746,12 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {/* NEW SECTION: Apprenticeship */}
+          {/* Apprenticeship Section */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-4 text-blue-700">
               Apprenticeship
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Yes/No */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Have you done an Apprenticeship?
@@ -817,8 +766,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                   <option value="Yes">Yes</option>
                 </select>
               </div>
-
-              {/* Show apprenticeship fields only if "Yes" */}
               {formData.apprenticeship.hasApprenticeship === "Yes" && (
                 <>
                   <div>
@@ -833,7 +780,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tenure (in years)
@@ -847,7 +793,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Salary / Stipend
@@ -860,7 +805,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Location
@@ -878,7 +822,7 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {/* NEW SECTION: Work Experience */}
+          {/* Work Experience Section */}
           <div className="bg-gray-50 p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-4 text-blue-700">
               Work Experience
@@ -889,7 +833,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 className="border border-gray-200 p-4 rounded-md mb-4"
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Company Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Company Name
@@ -902,7 +845,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  {/* Tenure */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tenure (in years)
@@ -916,7 +858,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  {/* Salary / Stipend */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Salary / Stipend
@@ -929,7 +870,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  {/* Location */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Location
@@ -942,7 +882,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                       className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-                  {/* Job Role */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Job Role
@@ -956,8 +895,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                     />
                   </div>
                 </div>
-
-                {/* Remove this Work Experience */}
                 {index > 0 && (
                   <div className="mt-4">
                     <button
@@ -971,7 +908,6 @@ const ApplyJobForm = ({ jobTitle, onSubmit, onCancel }) => {
                 )}
               </div>
             ))}
-
             <button
               type="button"
               onClick={handleAddWorkExperience}

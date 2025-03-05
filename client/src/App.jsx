@@ -12,6 +12,7 @@ import ViewApplications from "./pages/ViewApplications";
 import "quill/dist/quill.snow.css";
 import ApplyJobForm from "./pages/ApplyJobForm";
 import PrivateRoute from "./Routes/PrivateRoute.jsx";
+import UserPrivateRoute from "./Routes/UserPrivateRoute.jsx";
 
 const App = () => {
   const { showRecruiterLogin, setShowRecruiterLogin } = useContext(AppContext);
@@ -31,7 +32,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/application" element={<Application />} />
         <Route path="/apply-job/:id" element={<ApplyJob />} />
-        <Route path="/apply-job-form" element={<ApplyJobForm />} />
+        <Route path="/apply-job-form/:id" element={<ApplyJobForm />} />
 
         {/* ✅ Protected recruiter routes */}
         <Route element={<PrivateRoute />}>

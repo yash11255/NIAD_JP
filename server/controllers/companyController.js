@@ -311,6 +311,29 @@ export const changeVisiblity = async (req, res) => {
   }
 };
 
+//universal company controller
+export const getCompaniesWithJobs = async (req, res) => {
+  try {
+    const companies = await Company.find();
+
+    const companiesWithJobs = await Promise.all(
+      companies.map(async (company) => {
+        const jobs = await Job.find({ companyId: company._id });
+        return {
+          company,
+          jobs,
+        };
+      })
+    );
+
+    res.status(200).json(companiesWithJobs);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching companies and jobs",
+      error: error.message,
+    });
+  }
+};
 //logout
 export const logout = async (req, res) => {
   try {

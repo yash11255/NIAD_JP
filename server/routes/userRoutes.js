@@ -13,19 +13,19 @@ import { authenticate } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 //register
-router.post("/user-register", registerUser); //tested
+router.post("/user-register", registerUser); //tested - integrated
 
 //login
-router.post("/user-login", loginUser); //tested
+router.post("/user-login", loginUser); //tested - integrated
 
 // Get user Data
-router.get("/user", authenticate, getUserData); //tested
+router.get("/user", authenticate, getUserData); //tested - integrated
 
 // Apply for a job
 router.post("/apply/:id", authenticate, applyForJob); //tested
 
 // Get applied jobs data
-router.get("/applications", authenticate, getUserJobApplications); //tested
+router.get("/applications", authenticate, getUserJobApplications); //tested - integrated
 
 // update user resume
 router.post(

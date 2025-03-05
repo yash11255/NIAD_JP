@@ -10,7 +10,7 @@ const ApplyJob = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [jobsData, setJobData] = useState(null);
-  const { jobs } = useContext(AppContext);
+  const { jobs, userApplications } = useContext(AppContext);
   const [similarJobs, setSimilarJobs] = useState([]);
 
   useEffect(() => {
@@ -34,8 +34,20 @@ const ApplyJob = () => {
       setSimilarJobs(filteredJobs);
     }
   }, [id, jobs]);
+
+  // Determine if user already applied for the current job.
+  const hasApplied =
+    jobsData &&
+    userApplications &&
+    userApplications.some((app) => app.jobId._id === jobsData._id);
+
+  // Handle Apply Now button click
   const handleApplyNow = () => {
-    navigate("/apply-job-form");
+    // If already applied, do nothing or you could show an alert
+    if (hasApplied) {
+      return;
+    }
+    navigate(`/apply-job-form/${id}`);
   };
 
   return (
@@ -75,9 +87,14 @@ const ApplyJob = () => {
                 <div className="text-center md:text-right">
                   <button
                     onClick={handleApplyNow}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-md font-medium shadow-md hover:bg-blue-700 transition"
+                    disabled={hasApplied}
+                    className={`px-6 py-2 rounded-md font-medium shadow-md transition ${
+                      hasApplied
+                        ? "bg-gray-500 text-white cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                   >
-                    Apply Now
+                    {hasApplied ? "Already Applied" : "Apply Now"}
                   </button>
                   <p className="text-gray-500 text-sm mt-2">
                     Posted {moment(jobsData.date).fromNow()}

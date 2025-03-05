@@ -2,6 +2,7 @@ import express from "express";
 import {
   ChangeJobApplicationsStatus,
   changeVisiblity,
+  getCompaniesWithJobs,
   getCompanyData,
   getCompanyJobApplicants,
   getCompanyPostedJobs,
@@ -32,6 +33,9 @@ router.get("/applicants/:jobId", protectCompany, getCompanyJobApplicants); //tes
 
 // Get  Company Job List
 router.get("/list-jobs", protectCompany, getCompanyPostedJobs); //tested - integrated
+
+//get all jobs and companies
+router.get("/jnc", getCompaniesWithJobs);
 
 // Change Applcations Status
 router.post("/change-status", protectCompany, ChangeJobApplicationsStatus); //tested

@@ -1,18 +1,19 @@
 import React, { useState, useContext } from "react";
 import { assets } from "../assets/assets";
-import { UserButton, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { AppContext } from "../context/AppContext";
-// import UserLogin from "./UserLogin";
 import UserLogin from "./UserLogin";
+
+// Removed Clerk's UserButton and useUser
 
 const Navbar = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { user } = useUser();
-  const { setShowRecruiterLogin } = useContext(AppContext);
+  // Use userData and isUserAuthenticated from AppContext instead of Clerk's hook
+  const { userData, isUserAuthenticated, setShowRecruiterLogin, logoutUser } =
+    useContext(AppContext);
 
   return (
     <>
@@ -24,7 +25,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            {user ? (
+            {isUserAuthenticated ? (
               <>
                 <Link
                   to="/application"
@@ -32,8 +33,15 @@ const Navbar = () => {
                 >
                   Applied Jobs
                 </Link>
-                <p>Welcome, {user?.firstName}</p>
-                <UserButton />
+                <p>
+                  Welcome, {userData?.firstName || userData?.name || "User"}
+                </p>
+                <button
+                  onClick={logoutUser}
+                  className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <div className="flex gap-4">
@@ -43,7 +51,6 @@ const Navbar = () => {
                 >
                   Recruiter Login
                 </button>
-                {/* When user clicks "Login," open the CompanyLogin modal */}
                 <button
                   className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
                   onClick={() => setLoginOpen(true)}
@@ -78,7 +85,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Items */}
           <div className="flex flex-col gap-6 mt-10">
-            {user ? (
+            {isUserAuthenticated ? (
               <>
                 <Link
                   to="/application"
@@ -87,8 +94,18 @@ const Navbar = () => {
                 >
                   Applied Jobs
                 </Link>
-                <p>Welcome, {user?.firstName}</p>
-                <UserButton />
+                <p>
+                  Welcome, {userData?.firstName || userData?.name || "User"}
+                </p>
+                <button
+                  onClick={() => {
+                    logoutUser();
+                    setMenuOpen(false);
+                  }}
+                  className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <>
@@ -116,7 +133,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* 2. Render CompanyLogin Modal if loginOpen is true */}
+      {/* Render UserLogin Modal if loginOpen is true */}
       <UserLogin isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
