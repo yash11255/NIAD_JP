@@ -1,42 +1,51 @@
 import React, { useContext, useState } from "react";
-import { AppContext } from "../context/AppContext";
 import { ChevronLeft } from "lucide-react";
+import { AppContext } from "../context/AppContext";
+
+/**
+ * Helper to get a Tailwind color class for a given status.
+ * Customize as you see fit (e.g., "Onboarded", "Interviewed").
+ */
+function getStatusBadgeColor(status) {
+  switch (status) {
+    case "Accepted":
+      return "bg-green-500 text-white";
+    case "Rejected":
+      return "bg-red-500 text-white";
+    case "Onboarded":
+      return "bg-blue-500 text-white";
+    case "Interviewed":
+      return "bg-yellow-500 text-white";
+    default:
+      return "bg-gray-300 text-gray-800";
+  }
+}
 
 const ViewApplications = () => {
   const { jobs, jobApplicants, fetchJobApplicants } = useContext(AppContext);
   const [selectedJob, setSelectedJob] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Track Interviewed, Onboarded, Accept/Reject status for each applicant
-  const [applicationStatus, setApplicationStatus] = useState({});
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const applicantsPerPage = 2; // Adjust as desired
 
-  // Handle job selection
+  // When a job is selected, fetch its applicants
   const handleJobClick = async (job) => {
     setSelectedJob(job);
     setLoading(true);
     await fetchJobApplicants(job._id);
     setLoading(false);
+    setCurrentPage(1); // reset to first page whenever a new job is selected
   };
 
-  // Update application status state
-  const handleActionClick = (applicantId, actionType, value) => {
-    setApplicationStatus((prevState) => ({
-      ...prevState,
-      [applicantId]: {
-        ...prevState[applicantId],
-        [actionType]: value,
-      },
-    }));
-  };
-
-  return (
-    <div className="p-4 md:p-6 font-sans">
-      <h2 className="text-center text-2xl md:text-3xl font-bold mb-6">
-        Job Applications
-      </h2>
-
-      {/* If no job is selected, show list of jobs */}
-      {!selectedJob && (
+  // If job not selected, show job list
+  if (!selectedJob) {
+    return (
+      <div className="p-4 md:p-6 font-sans">
+        <h2 className="text-center text-2xl md:text-3xl font-bold mb-6">
+          Job Applications
+        </h2>
         <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-5">
           <h3 className="text-lg font-semibold mb-3">Available Jobs</h3>
           <ul className="divide-y divide-gray-300">
@@ -51,553 +60,246 @@ const ViewApplications = () => {
             ))}
           </ul>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* If a job is selected, show applicants */}
-      {selectedJob && (
-        <div className="mt-6">
-          <h3 className="text-center text-xl font-semibold mb-4">
-            {selectedJob.title} - Candidates
-          </h3>
-          <button
-            className="block mx-auto bg-gray-500 text-white px-4 py-2 rounded-md mb-4 hover:bg-gray-600 transition"
-            onClick={() => setSelectedJob(null)}
+  // Show loading or no applicants
+  if (loading) {
+    return (
+      <div className="p-4 md:p-6 font-sans">
+        <button
+          className="block mx-auto bg-gray-500 text-white px-4 py-2 rounded-md mb-4 hover:bg-gray-600 transition"
+          onClick={() => setSelectedJob(null)}
+        >
+          <ChevronLeft className="inline mr-1" size={18} /> Back to Jobs
+        </button>
+        <p className="text-center text-gray-600">Loading applications...</p>
+      </div>
+    );
+  }
+
+  if (jobApplicants.length === 0) {
+    return (
+      <div className="p-4 md:p-6 font-sans">
+        <button
+          className="block mx-auto bg-gray-500 text-white px-4 py-2 rounded-md mb-4 hover:bg-gray-600 transition"
+          onClick={() => setSelectedJob(null)}
+        >
+          <ChevronLeft className="inline mr-1" size={18} /> Back to Jobs
+        </button>
+        <p className="text-center text-gray-600">No applications found.</p>
+      </div>
+    );
+  }
+
+  // Pagination logic
+  const totalApplicants = jobApplicants.length;
+  const totalPages = Math.ceil(totalApplicants / applicantsPerPage);
+
+  const startIndex = (currentPage - 1) * applicantsPerPage;
+  const endIndex = startIndex + applicantsPerPage;
+  const currentApplicants = jobApplicants.slice(startIndex, endIndex);
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  return (
+    <div className="p-4 md:p-6 font-sans">
+      <h2 className="text-center text-2xl md:text-3xl font-bold mb-6">
+        {selectedJob.title} - Candidates
+      </h2>
+      <button
+        className="block mx-auto bg-gray-500 text-white px-4 py-2 rounded-md mb-4 hover:bg-gray-600 transition"
+        onClick={() => setSelectedJob(null)}
+      >
+        <ChevronLeft className="inline mr-1" size={18} /> Back to Jobs
+      </button>
+
+      {/* Applicant Cards */}
+      {currentApplicants.map((app, index) => {
+        // 'app' is a single applicant record
+        const data = app || {};
+        // If your API returns something like { status: "Accepted" }, show it:
+        const badgeColor = getStatusBadgeColor(data.status);
+        const applicantName = data.userId?.name || "N/A";
+
+        return (
+          <div
+            key={data._id || index}
+            className="bg-white shadow-md rounded-md p-4 mb-6"
           >
-            <ChevronLeft className="inline mr-1" size={18} /> Back to Jobs
-          </button>
+            {/* Header: Name + Status Badge */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <h3 className="text-lg font-semibold">
+                Applicant: {applicantName}
+              </h3>
+              <span
+                className={`inline-block px-3 py-1 mt-2 sm:mt-0 rounded-md text-sm font-medium ${badgeColor}`}
+              >
+                {data.status || "No Status"}
+              </span>
+            </div>
 
-          {loading ? (
-            <p className="text-center text-gray-600">Loading applications...</p>
-          ) : jobApplicants.length === 0 ? (
-            <p className="text-center text-gray-600">No applications found.</p>
-          ) : (
-            <div className="max-w-full overflow-x-auto shadow-md rounded-lg border bg-white">
-              {/*
-                Horizontal scroll container:
-                - "overflow-x-auto" and "whitespace-nowrap" ensure columns are scrollable.
-              */}
-              <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 touch-auto">
-                <table className="min-w-full table-auto whitespace-nowrap">
-                  <thead className="bg-blue-500 text-white">
-                    <tr>
-                      {/*
-                        Mark columns you want ALWAYS visible with no "hidden" classes.
-                        Mark columns you want hidden on small screens with "hidden sm:table-cell".
-                        Mark columns you want hidden on medium screens with "hidden md:table-cell", etc.
-                      */}
-
-                      {/* 1 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Company ID
-                      </th>
-                      {/* 2 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Application Status
-                      </th>
-                      {/* 3 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Application Date
-                      </th>
-                      {/* 4 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Name
-                      </th>
-                      {/* 5 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Date of Birth
-                      </th>
-                      {/* 6 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Father's Name
-                      </th>
-                      {/* 7 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Gender
-                      </th>
-                      {/* 8 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Marital Status
-                      </th>
-                      {/* 9 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Nationality
-                      </th>
-                      {/* 10 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Aadhaar Number
-                      </th>
-                      {/* 11 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Phone Number
-                      </th>
-                      {/* 12 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Alternate Number
-                      </th>
-                      {/* 13 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Email
-                      </th>
-                      {/* 14 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Height
-                      </th>
-                      {/* 15 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Job Title
-                      </th>
-                      {/* 16 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Location
-                      </th>
-                      {/* 17 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden sm:table-cell">
-                        Experience
-                      </th>
-                      {/* 18 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        10th Board
-                      </th>
-                      {/* 19 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        10th Year
-                      </th>
-                      {/* 20 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        10th Percentage
-                      </th>
-                      {/* 21 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        12th Board
-                      </th>
-                      {/* 22 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        12th Year
-                      </th>
-                      {/* 23 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        12th Percentage
-                      </th>
-                      {/* 24 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Graduation Degree
-                      </th>
-                      {/* 25 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Graduation University
-                      </th>
-                      {/* 26 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Graduation Year
-                      </th>
-                      {/* 27 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Graduation CGPA
-                      </th>
-                      {/* 28 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Certifications
-                      </th>
-                      {/* 29 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Permanent Address
-                      </th>
-                      {/* 30 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Current Address
-                      </th>
-                      {/* 31 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Apprenticeship Company
-                      </th>
-                      {/* 32 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Apprenticeship Tenure
-                      </th>
-                      {/* 33 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Apprenticeship Salary
-                      </th>
-                      {/* 34 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Apprenticeship Location
-                      </th>
-                      {/* 35 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Work Company
-                      </th>
-                      {/* 36 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Work Tenure
-                      </th>
-                      {/* 37 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Work Salary
-                      </th>
-                      {/* 38 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Work Location
-                      </th>
-                      {/* 39 */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase hidden md:table-cell">
-                        Job Role
-                      </th>
-                      {/* 40 - Actions */}
-                      <th className="px-4 py-3 text-left text-xs font-medium uppercase">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {jobApplicants.map((app, index) => {
-                      const data = app.applicationData?.applicationData || {};
-                      const applicantId = app._id;
-
-                      return (
-                        <tr
-                          key={index}
-                          className={
-                            index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                          }
-                        >
-                          {/* 1. Company ID (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.companyId || "N/A"}
-                          </td>
-
-                          {/* 2. Application Status (always visible) */}
-                          <td className="px-4 py-4">
-                            {data.applicationStatus || "N/A"}
-                          </td>
-
-                          {/* 3. Application Date (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.applicationDate || "N/A"}
-                          </td>
-
-                          {/* 4. Name (always visible) */}
-                          <td className="px-4 py-4">{data.name || "N/A"}</td>
-
-                          {/* 5. Date of Birth (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.dateOfBirth || "N/A"}
-                          </td>
-
-                          {/* 6. Father's Name (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.fathersName || "N/A"}
-                          </td>
-
-                          {/* 7. Gender (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.gender || "N/A"}
-                          </td>
-
-                          {/* 8. Marital Status (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.maritalStatus || "N/A"}
-                          </td>
-
-                          {/* 9. Nationality (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.nationality || "N/A"}
-                          </td>
-
-                          {/* 10. Aadhaar Number (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.aadhaarNumber || "N/A"}
-                          </td>
-
-                          {/* 11. Phone Number (always visible) */}
-                          <td className="px-4 py-4">
-                            {data.phoneNumber || "N/A"}
-                          </td>
-
-                          {/* 12. Alternate Number (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.alternateNumber || "N/A"}
-                          </td>
-
-                          {/* 13. Email (always visible) */}
-                          <td className="px-4 py-4">{data.email || "N/A"}</td>
-
-                          {/* 14. Height (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.height || "N/A"}
-                          </td>
-
-                          {/* 15. Job Title (always visible) */}
-                          <td className="px-4 py-4">
-                            {data.jobTitle || "N/A"}
-                          </td>
-
-                          {/* 16. Location (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.location || "N/A"}
-                          </td>
-
-                          {/* 17. Experience (hidden on < sm) */}
-                          <td className="px-4 py-4 hidden sm:table-cell">
-                            {data.experience || "N/A"}
-                          </td>
-
-                          {/* 18. 10th Board (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.tenth?.board || "N/A"}
-                          </td>
-
-                          {/* 19. 10th Year (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.tenth?.year || "N/A"}
-                          </td>
-
-                          {/* 20. 10th Percentage (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.tenth?.percentage || "N/A"}
-                          </td>
-
-                          {/* 21. 12th Board (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.twelfth?.board || "N/A"}
-                          </td>
-
-                          {/* 22. 12th Year (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.twelfth?.year || "N/A"}
-                          </td>
-
-                          {/* 23. 12th Percentage (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.twelfth?.percentage || "N/A"}
-                          </td>
-
-                          {/* 24. Graduation Degree (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.graduation?.degree || "N/A"}
-                          </td>
-
-                          {/* 25. Graduation University (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.graduation?.university || "N/A"}
-                          </td>
-
-                          {/* 26. Graduation Year (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.graduation?.year || "N/A"}
-                          </td>
-
-                          {/* 27. Graduation CGPA (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.graduation?.cgpa || "N/A"}
-                          </td>
-
-                          {/* 28. Certifications (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.education?.graduation?.certifications?.join(
-                              ", "
-                            ) || "N/A"}
-                          </td>
-
-                          {/* 29. Permanent Address (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.address?.permanentAddress || "N/A"}
-                          </td>
-
-                          {/* 30. Current Address (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.address?.currentAddress || "N/A"}
-                          </td>
-
-                          {/* 31. Apprenticeship Company (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.apprenticeship?.companyName || "N/A"}
-                          </td>
-
-                          {/* 32. Apprenticeship Tenure (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.apprenticeship?.tenure || "N/A"}
-                          </td>
-
-                          {/* 33. Apprenticeship Salary (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.apprenticeship?.salary || "N/A"}
-                          </td>
-
-                          {/* 34. Apprenticeship Location (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.apprenticeship?.location || "N/A"}
-                          </td>
-
-                          {/* 35. Work Company (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.workExperience?.companyName || "N/A"}
-                          </td>
-
-                          {/* 36. Work Tenure (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.workExperience?.tenure || "N/A"}
-                          </td>
-
-                          {/* 37. Work Salary (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.workExperience?.salary || "N/A"}
-                          </td>
-
-                          {/* 38. Work Location (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.workExperience?.location || "N/A"}
-                          </td>
-
-                          {/* 39. Job Role (hidden on < md) */}
-                          <td className="px-4 py-4 hidden md:table-cell">
-                            {data.workExperience?.jobRole || "N/A"}
-                          </td>
-
-                          {/* 40. Actions (always visible) */}
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col space-y-2">
-                              {/* Interview Status */}
-                              <div className="flex space-x-2">
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.interviewStatus === "Interviewed"
-                                      ? "bg-green-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "interviewStatus",
-                                      "Interviewed"
-                                    )
-                                  }
-                                >
-                                  Interviewed
-                                </button>
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.interviewStatus === "Not Interviewed"
-                                      ? "bg-red-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "interviewStatus",
-                                      "Not Interviewed"
-                                    )
-                                  }
-                                >
-                                  Not Interviewed
-                                </button>
-                              </div>
-
-                              {/* Onboard Status */}
-                              <div className="flex space-x-2">
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.onboardStatus === "Onboarded"
-                                      ? "bg-blue-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "onboardStatus",
-                                      "Onboarded"
-                                    )
-                                  }
-                                >
-                                  Onboarded
-                                </button>
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.onboardStatus === "Boarded"
-                                      ? "bg-yellow-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "onboardStatus",
-                                      "Boarded"
-                                    )
-                                  }
-                                >
-                                  Boarded
-                                </button>
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.onboardStatus === "Not Yet"
-                                      ? "bg-gray-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "onboardStatus",
-                                      "Not Yet"
-                                    )
-                                  }
-                                >
-                                  Not Yet
-                                </button>
-                              </div>
-
-                              {/* Accept/Reject Status */}
-                              <div className="flex space-x-2">
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.acceptRejectStatus === "Accepted"
-                                      ? "bg-green-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "acceptRejectStatus",
-                                      "Accepted"
-                                    )
-                                  }
-                                >
-                                  Accept
-                                </button>
-                                <button
-                                  className={`px-3 py-1 text-xs rounded-md ${
-                                    applicationStatus[applicantId]
-                                      ?.acceptRejectStatus === "Rejected"
-                                      ? "bg-red-500"
-                                      : "bg-gray-300"
-                                  }`}
-                                  onClick={() =>
-                                    handleActionClick(
-                                      applicantId,
-                                      "acceptRejectStatus",
-                                      "Rejected"
-                                    )
-                                  }
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            {/* Personal Info */}
+            <div className="mt-4">
+              <h4 className="font-medium text-gray-700">Personal Info</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm">
+                <div>
+                  <span className="font-semibold">Date of Birth: </span>
+                  {data.dateOfBirth || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Father's Name: </span>
+                  {data.fathersName || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Gender: </span>
+                  {data.gender || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Marital Status: </span>
+                  {data.maritalStatus || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Nationality: </span>
+                  {data.nationality || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Aadhaar: </span>
+                  {data.aadhaarNumber || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Phone: </span>
+                  {data.phoneNumber || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Alternate: </span>
+                  {data.altNumber || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Email: </span>
+                  {data.email || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Height: </span>
+                  {data.height || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Job Title: </span>
+                  {data.jobTitle || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Location: </span>
+                  {data.location || "N/A"}
+                </div>
+                <div>
+                  <span className="font-semibold">Experience: </span>
+                  {data.experience || "N/A"}
+                </div>
               </div>
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Education */}
+            <div className="mt-4">
+              <h4 className="font-medium text-gray-700">Education</h4>
+              <div className="mt-2 text-sm">
+                <p className="font-semibold">10th Standard</p>
+                <p>Board: {data.education?.tenth?.board || "N/A"}</p>
+                <p>Year: {data.education?.tenth?.year || "N/A"}</p>
+                <p>Percentage: {data.education?.tenth?.percentage || "N/A"}</p>
+              </div>
+              <div className="mt-2 text-sm">
+                <p className="font-semibold">12th Standard</p>
+                <p>Board: {data.education?.twelfth?.board || "N/A"}</p>
+                <p>Year: {data.education?.twelfth?.year || "N/A"}</p>
+                <p>
+                  Percentage: {data.education?.twelfth?.percentage || "N/A"}
+                </p>
+              </div>
+              <div className="mt-2 text-sm">
+                <p className="font-semibold">Graduation</p>
+                <p>Degree: {data.education?.graduation?.degree || "N/A"}</p>
+                <p>
+                  University: {data.education?.graduation?.university || "N/A"}
+                </p>
+                <p>
+                  Year: {data.education?.graduation?.yearOfGraduation || "N/A"}
+                </p>
+                <p>CGPA: {data.education?.graduation?.cgpa || "N/A"}</p>
+                <p>
+                  Certifications:{" "}
+                  {data.education?.graduation?.certifications?.length
+                    ? data.education.graduation.certifications.join(", ")
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+
+            {/* Addresses */}
+            <div className="mt-4 text-sm">
+              <h4 className="font-medium text-gray-700">Address</h4>
+              <p className="mt-2 font-semibold">Permanent Address:</p>
+              <p>{data.address?.permanentAddress || "N/A"}</p>
+              <p className="mt-2 font-semibold">Current Address:</p>
+              <p>{data.address?.currentAddress || "N/A"}</p>
+            </div>
+
+            {/* Apprenticeship */}
+            <div className="mt-4 text-sm">
+              <h4 className="font-medium text-gray-700">Apprenticeship</h4>
+              <p>Company: {data.apprenticeship?.companyName || "N/A"}</p>
+              <p>Tenure: {data.apprenticeship?.tenure || "N/A"}</p>
+              <p>Salary: {data.apprenticeship?.salaryStipend || "N/A"}</p>
+              <p>Location: {data.apprenticeship?.location || "N/A"}</p>
+            </div>
+
+            {/* Work Experiences */}
+            <div className="mt-4 text-sm">
+              <h4 className="font-medium text-gray-700">Work Experience</h4>
+              {data.workExperiences?.length ? (
+                data.workExperiences.map((exp, i) => (
+                  <div key={i} className="mt-2 border-l-4 border-blue-300 pl-2">
+                    <p>Company: {exp.companyName || "N/A"}</p>
+                    <p>Tenure: {exp.tenure || "N/A"}</p>
+                    <p>Salary/Stipend: {exp.salaryStipend || "N/A"}</p>
+                    <p>Location: {exp.location || "N/A"}</p>
+                    <p>Job Role: {exp.jobRole || "N/A"}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No work experiences</p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center gap-4 mt-8">
+        <button
+          onClick={goToPreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:bg-gray-200"
+        >
+          Prev
+        </button>
+        <span className="font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={goToNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:bg-gray-200"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
