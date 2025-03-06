@@ -322,6 +322,90 @@ export const changeVisiblity = async (req, res) => {
   }
 };
 
+//Change Interview Status
+export const ChangeInterviewStatus = async (req, res) => {
+  try {
+    const { id, interviewStatus } = req.body;
+
+    // Validate request body
+    if (!id || !interviewStatus) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: id or interviewStatus.",
+      });
+    }
+
+    const companyId = req.company._id.toString();
+
+    // Find the job application by its ID
+    const jobApplication = await JobApplication.findById(id);
+    if (!jobApplication) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Job application not found" });
+    }
+
+    // Check if the job application belongs to the authenticated company
+    if (jobApplication.companyId.toString() !== companyId) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Unauthorized: You are not allowed to update the interview status of this job application.",
+      });
+    }
+
+    // Update the interview status
+    jobApplication.interview = interviewStatus;
+    await jobApplication.save();
+
+    return res.json({ success: true, message: "Interview status updated" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+//Change Job Status
+export const ChangeOnboardingStatus = async (req, res) => {
+  try {
+    const { id, onboardingStatus } = req.body;
+
+    // Validate request body
+    if (!id || !onboardingStatus) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: id or onboardingStatus.",
+      });
+    }
+
+    const companyId = req.company._id.toString();
+
+    // Find the job application by its ID
+    const jobApplication = await JobApplication.findById(id);
+    if (!jobApplication) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Job application not found" });
+    }
+
+    // Check if the job application belongs to the authenticated company
+    if (jobApplication.companyId.toString() !== companyId) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Unauthorized: You are not allowed to update the onboarding status of this job application.",
+      });
+    }
+
+    // Update the onboarding status
+    jobApplication.onboarding = onboardingStatus;
+    await jobApplication.save();
+
+    return res.json({ success: true, message: "Onboarding status updated" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 //universal company controller
 export const getCompaniesWithJobs = async (req, res) => {
   try {

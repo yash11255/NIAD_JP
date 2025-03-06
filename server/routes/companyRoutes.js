@@ -1,6 +1,8 @@
 import express from "express";
 import {
+  ChangeInterviewStatus,
   ChangeJobApplicationsStatus,
+  ChangeOnboardingStatus,
   changeVisiblity,
   getCompaniesWithJobs,
   getCompanyData,
@@ -39,6 +41,12 @@ router.get("/jnc", getCompaniesWithJobs);
 
 // Change Applcations Status
 router.post("/change-status", protectCompany, ChangeJobApplicationsStatus); //tested
+
+// Change Interview Status
+router.post("/change-int", protectCompany, ChangeInterviewStatus); //tested
+
+// Change Onbaording Status
+router.post("/change-onboard", protectCompany, ChangeOnboardingStatus); //tested
 
 // Change Applcations Visiblity
 router.post("/change-visibility", protectCompany, changeVisiblity); //tested - Integrated

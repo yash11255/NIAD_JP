@@ -1,4 +1,3 @@
-// ViewApplications.js
 "use client";
 
 import { useContext, useState } from "react";
@@ -37,7 +36,9 @@ const ViewApplications = () => {
     jobApplicants,
     fetchJobApplicants,
     jobAppData,
-    changeJobApplicationStatus, // CHANGED CODE: import the new API function
+    changeJobApplicationStatus, // for accept/reject toggle
+    changeInterviewStatus, // CHANGED CODE: new API function for interview toggle
+    changeOnboardingStatus, // CHANGED CODE: new API function for onboarding toggle
   } = useContext(AppContext);
   const [selectedJob, setSelectedJob] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -171,7 +172,6 @@ const ViewApplications = () => {
       <div className="space-y-6">
         {currentApplicants.map((app, index) => {
           const data = app;
-          // console.log("this is status", data.status);
           const badgeColor = getStatusBadgeColor(data.status);
           const applicantName = data.userId?.name || "N/A";
           const initials =
@@ -241,15 +241,17 @@ const ViewApplications = () => {
                       <input
                         type="checkbox"
                         className="opacity-0 w-0 h-0"
-                        onChange={() =>
-                          setData((prev) => ({
-                            ...prev,
-                            interview:
-                              prev.interview === "Interviewed"
-                                ? "Not Interviewed"
-                                : "Interviewed",
-                          }))
-                        }
+                        // CHANGED CODE: Call changeInterviewStatus API from context
+                        onChange={async () => {
+                          const newInterviewStatus =
+                            data.interview === "Interviewed"
+                              ? "Not Interviewed"
+                              : "Interviewed";
+                          await changeInterviewStatus(
+                            data._id,
+                            newInterviewStatus
+                          );
+                        }}
                         checked={data.interview === "Interviewed"}
                       />
                       <span
@@ -276,15 +278,17 @@ const ViewApplications = () => {
                       <input
                         type="checkbox"
                         className="opacity-0 w-0 h-0"
-                        onChange={() =>
-                          setData((prev) => ({
-                            ...prev,
-                            onboarding:
-                              prev.onboarding === "Onboarded"
-                                ? "Not Onboarded"
-                                : "Onboarded",
-                          }))
-                        }
+                        // CHANGED CODE: Call changeOnboardingStatus API from context
+                        onChange={async () => {
+                          const newOnboardingStatus =
+                            data.onboarding === "Onboarded"
+                              ? "Not Onboarded"
+                              : "Onboarded";
+                          await changeOnboardingStatus(
+                            data._id,
+                            newOnboardingStatus
+                          );
+                        }}
                         checked={data.onboarding === "Onboarded"}
                       />
                       <span

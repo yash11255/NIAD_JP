@@ -286,6 +286,58 @@ export const AppContextProvider = (props) => {
     }
   };
 
+  // changing Interview status
+  const changeInterviewStatus = async (applicationId, newInterviewStatus) => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/company/change-int`,
+        { id: applicationId, interviewStatus: newInterviewStatus },
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        setJobApplicants((prev) =>
+          prev.map((app) =>
+            app._id === applicationId
+              ? { ...app, interview: newInterviewStatus }
+              : app
+          )
+        );
+        return response.data;
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating interview status:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  //  changing Onboarding status
+  const changeOnboardingStatus = async (applicationId, newOnboardingStatus) => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/company/change-onboard`,
+        { id: applicationId, onboardingStatus: newOnboardingStatus },
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        setJobApplicants((prev) =>
+          prev.map((app) =>
+            app._id === applicationId
+              ? { ...app, onboarding: newOnboardingStatus }
+              : app
+          )
+        );
+        return response.data;
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating onboarding status:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
   // universal job and companies fetch fucntion
   useEffect(() => {
     const fetchCompaniesWithJobs = async () => {
@@ -370,6 +422,8 @@ export const AppContextProvider = (props) => {
     jobAppData,
     setJobAppData,
     changeJobApplicationStatus,
+    changeInterviewStatus,
+    changeOnboardingStatus,
   };
 
   return (
