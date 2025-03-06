@@ -262,6 +262,30 @@ export const AppContextProvider = (props) => {
     setIsUserAuthenticated(false);
   };
 
+  //update application status (Accepted/Rejected)
+  const changeJobApplicationStatus = async (applicationId, newStatus) => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/company/change-status`,
+        { id: applicationId, status: newStatus },
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        setJobApplicants((prev) =>
+          prev.map((app) =>
+            app._id === applicationId ? { ...app, status: newStatus } : app
+          )
+        );
+        return response.data;
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating application status:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
   // universal job and companies fetch fucntion
   useEffect(() => {
     const fetchCompaniesWithJobs = async () => {
@@ -345,6 +369,7 @@ export const AppContextProvider = (props) => {
     applyForJob,
     jobAppData,
     setJobAppData,
+    changeJobApplicationStatus,
   };
 
   return (

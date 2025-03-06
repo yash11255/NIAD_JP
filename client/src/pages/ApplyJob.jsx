@@ -1,3 +1,4 @@
+// ApplyJob.js
 import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -5,6 +6,18 @@ import Navbar from "../Components/Navbar";
 import { assets } from "../assets/assets";
 import moment from "moment";
 import JobCard from "../Components/Jobcard";
+
+// CHANGED CODE: Helper function to style the status badge
+const getStatusBadgeColor = (status) => {
+  switch (status) {
+    case "Accepted":
+      return "bg-green-500 text-white";
+    case "Rejected":
+      return "bg-red-500 text-white";
+    default:
+      return "bg-gray-300 text-gray-800";
+  }
+};
 
 const ApplyJob = () => {
   const { id } = useParams();
@@ -17,10 +30,8 @@ const ApplyJob = () => {
     if (!jobs || jobs.length === 0) return;
 
     const selectedJob = jobs.find((job) => job._id === id);
-
     if (selectedJob) {
       setJobData(selectedJob);
-
       // Get similar jobs by matching role or location
       const filteredJobs = jobs
         .filter(
@@ -29,21 +40,19 @@ const ApplyJob = () => {
             (job.level === selectedJob.level ||
               job.location === selectedJob.location)
         )
-        .slice(0, 4); // Show max 4 similar jobs
-
+        .slice(0, 4);
       setSimilarJobs(filteredJobs);
     }
   }, [id, jobs]);
 
-  // Determine if user already applied for the current job.
-  const hasApplied =
+  // CHANGED CODE: Determine if the user has applied for this job
+  const userApplication =
     jobsData &&
     userApplications &&
-    userApplications.some((app) => app.jobId._id === jobsData._id);
+    userApplications.find((app) => app.jobId._id === jobsData._id);
+  const hasApplied = Boolean(userApplication);
 
-  // Handle Apply Now button click
   const handleApplyNow = () => {
-    // If already applied, do nothing or you could show an alert
     if (hasApplied) {
       return;
     }
@@ -58,7 +67,6 @@ const ApplyJob = () => {
         <div className="bg-white shadow-lg rounded-lg p-8 w-full lg:w-3/4">
           {jobsData ? (
             <>
-              {/* Job Header */}
               <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-b pb-6">
                 <div className="flex items-center gap-6">
                   <img
@@ -102,7 +110,22 @@ const ApplyJob = () => {
                 </div>
               </div>
 
-              {/* Job Description */}
+              {/* CHANGED CODE: Display application status if the user has applied */}
+              {hasApplied && (
+                <div className="mt-4">
+                  <p className="text-lg font-semibold">
+                    Your Application Status:{" "}
+                    <span
+                      className={`px-3 py-1 rounded-md text-sm ${getStatusBadgeColor(
+                        userApplication.status
+                      )}`}
+                    >
+                      {userApplication.status}
+                    </span>
+                  </p>
+                </div>
+              )}
+
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800">
                   Job Description
@@ -113,7 +136,6 @@ const ApplyJob = () => {
                 ></div>
               </div>
 
-              {/* Responsibilities & Requirements */}
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800">
                   Responsibilities & Requirements
@@ -125,7 +147,6 @@ const ApplyJob = () => {
                 </ul>
               </div>
 
-              {/* Additional Job Details */}
               <div className="mt-6 border-t pt-4 text-gray-600 flex flex-wrap justify-between">
                 <p>
                   📅 Application Deadline:{" "}

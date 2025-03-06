@@ -1,3 +1,4 @@
+// ViewApplications.js
 "use client";
 
 import { useContext, useState } from "react";
@@ -14,7 +15,6 @@ import { AppContext } from "../context/AppContext";
 
 /**
  * Helper to get a Tailwind color class for a given status.
- * Customize as you see fit (e.g., "Onboarded", "Interviewed").
  */
 function getStatusBadgeColor(status) {
   switch (status) {
@@ -32,26 +32,29 @@ function getStatusBadgeColor(status) {
 }
 
 const ViewApplications = () => {
-  const { jobs, jobApplicants, fetchJobApplicants, jobAppData } =
-    useContext(AppContext);
+  const {
+    jobs,
+    jobApplicants,
+    fetchJobApplicants,
+    jobAppData,
+    changeJobApplicationStatus, // CHANGED CODE: import the new API function
+  } = useContext(AppContext);
   const [selectedJob, setSelectedJob] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const applicantsPerPage = 2; // Adjust as desired
+  const applicantsPerPage = 2;
 
-  // When a job is selected, fetch its applicants
   const handleJobClick = async (job) => {
     setSelectedJob(job);
     setLoading(true);
     await fetchJobApplicants(job._id);
     setLoading(false);
-    setCurrentPage(1); // reset to first page whenever a new job is selected
+    setCurrentPage(1);
   };
 
-  // If job not selected, show job list
   if (!selectedJob) {
     return (
       <div className="container mx-auto py-8 px-4 max-w-5xl font-sans">
@@ -91,7 +94,6 @@ const ViewApplications = () => {
     );
   }
 
-  // Show loading or no applicants
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4 max-w-5xl font-sans">
@@ -130,14 +132,11 @@ const ViewApplications = () => {
     );
   }
 
-  // Pagination logic
   const totalApplicants = jobApplicants.length;
   const totalPages = Math.ceil(totalApplicants / applicantsPerPage);
-
   const startIndex = (currentPage - 1) * applicantsPerPage;
   const endIndex = startIndex + applicantsPerPage;
   const currentApplicants = jobApplicants.slice(startIndex, endIndex);
-  console.log("currentapplicants", currentApplicants);
 
   const goToPreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -169,14 +168,10 @@ const ViewApplications = () => {
         </span>
       </div>
 
-      {/* Applicant Cards */}
       <div className="space-y-6">
         {currentApplicants.map((app, index) => {
           const data = app;
-          console.log("this is data", app, index);
-
-          // console.log(normalizedData);
-          // If your API returns something like { status: "Accepted" }, show it:
+          // console.log("this is status", data.status);
           const badgeColor = getStatusBadgeColor(data.status);
           const applicantName = data.userId?.name || "N/A";
           const initials =
@@ -194,9 +189,7 @@ const ViewApplications = () => {
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
               <div className="bg-gray-50 p-4 pb-4">
-                {/* Status Labels on Top */}
                 <div className="flex flex-wrap gap-2 mb-2">
-                  {/* Interview Status */}
                   <span
                     className={`px-3 py-1.5 rounded-md text-sm font-medium ${
                       data.interview === "Interviewed"
@@ -206,8 +199,6 @@ const ViewApplications = () => {
                   >
                     {data.interview || "Not Interviewed"}
                   </span>
-
-                  {/* Onboarding Status */}
                   <span
                     className={`px-3 py-1.5 rounded-md text-sm font-medium ${
                       data.onboarding === "Onboarded"
@@ -217,20 +208,17 @@ const ViewApplications = () => {
                   >
                     {data.onboarding || "Not Onboarded"}
                   </span>
-
-                  {/* Accept/Reject Status */}
                   <span
                     className={`px-3 py-1.5 rounded-md text-sm font-medium ${
-                      data.decision === "Accepted"
+                      data.status === "Accepted"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {data.decision || "Pending"}
+                    {data.status || "Pending"}
                   </span>
                 </div>
 
-                {/* Applicant Info */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-blue-100 border-2 border-blue-200 flex items-center justify-center text-blue-700 font-bold">
@@ -245,65 +233,108 @@ const ViewApplications = () => {
                   </div>
                 </div>
 
-                {/* Toggle Buttons */}
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {/* Interview Toggle */}
+                <div className="mt-4 flex flex-wrap gap-6">
+                  {/* Toggle Interview */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setData((prev) => ({
-                          ...prev,
-                          interview:
-                            prev.interview === "Interviewed"
-                              ? "Not Interviewed"
-                              : "Interviewed",
-                        }))
-                      }
-                      className="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300"
-                    >
-                      Toggle Interview
-                    </button>
+                    <span className="text-sm font-medium">Interview</span>
+                    <label className="relative inline-block w-12 h-6">
+                      <input
+                        type="checkbox"
+                        className="opacity-0 w-0 h-0"
+                        onChange={() =>
+                          setData((prev) => ({
+                            ...prev,
+                            interview:
+                              prev.interview === "Interviewed"
+                                ? "Not Interviewed"
+                                : "Interviewed",
+                          }))
+                        }
+                        checked={data.interview === "Interviewed"}
+                      />
+                      <span
+                        className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 transition-all duration-300 rounded-full ${
+                          data.interview === "Interviewed"
+                            ? "bg-blue-500"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                      <span
+                        className={`absolute left-1 top-1 transition-all duration-300 bg-white rounded-full w-4 h-4 transform ${
+                          data.interview === "Interviewed"
+                            ? "translate-x-6"
+                            : ""
+                        }`}
+                      ></span>
+                    </label>
                   </div>
 
-                  {/* Onboarding Toggle */}
+                  {/* Toggle Onboarding */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setData((prev) => ({
-                          ...prev,
-                          onboarding:
-                            prev.onboarding === "Onboarded"
-                              ? "Not Onboarded"
-                              : "Onboarded",
-                        }))
-                      }
-                      className="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300"
-                    >
-                      Toggle Onboarding
-                    </button>
+                    <span className="text-sm font-medium">Onboarding</span>
+                    <label className="relative inline-block w-12 h-6">
+                      <input
+                        type="checkbox"
+                        className="opacity-0 w-0 h-0"
+                        onChange={() =>
+                          setData((prev) => ({
+                            ...prev,
+                            onboarding:
+                              prev.onboarding === "Onboarded"
+                                ? "Not Onboarded"
+                                : "Onboarded",
+                          }))
+                        }
+                        checked={data.onboarding === "Onboarded"}
+                      />
+                      <span
+                        className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 transition-all duration-300 rounded-full ${
+                          data.onboarding === "Onboarded"
+                            ? "bg-blue-500"
+                            : "bg-gray-300"
+                        }`}
+                      ></span>
+                      <span
+                        className={`absolute left-1 top-1 transition-all duration-300 bg-white rounded-full w-4 h-4 transform ${
+                          data.onboarding === "Onboarded" ? "translate-x-6" : ""
+                        }`}
+                      ></span>
+                    </label>
                   </div>
 
-                  {/* Accept/Reject Toggle */}
+                  {/* Toggle Accept/Reject */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setData((prev) => ({
-                          ...prev,
-                          decision:
-                            prev.decision === "Accepted"
+                    <span className="text-sm font-medium">Decision</span>
+                    <label className="relative inline-block w-12 h-6">
+                      <input
+                        type="checkbox"
+                        className="opacity-0 w-0 h-0"
+                        onChange={async () => {
+                          const newStatus =
+                            data.status === "Accepted"
                               ? "Rejected"
-                              : "Accepted",
-                        }))
-                      }
-                      className="px-3 py-1.5 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300"
-                    >
-                      Toggle Accept/Reject
-                    </button>
+                              : "Accepted";
+                          await changeJobApplicationStatus(data._id, newStatus); // CHANGED CODE: call API function
+                        }}
+                        checked={data.status === "Accepted"}
+                      />
+                      <span
+                        className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 transition-all duration-300 rounded-full ${
+                          data.status === "Accepted"
+                            ? "bg-green-500"
+                            : "bg-red-500"
+                        }`}
+                      ></span>
+                      <span
+                        className={`absolute left-1 top-1 transition-all duration-300 bg-white rounded-full w-4 h-4 transform ${
+                          data.status === "Accepted" ? "translate-x-6" : ""
+                        }`}
+                      ></span>
+                    </label>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs */}
               <div className="border-b border-gray-200">
                 <div className="flex overflow-x-auto">
                   <button
@@ -349,9 +380,7 @@ const ViewApplications = () => {
                 </div>
               </div>
 
-              {/* Tab Content */}
               <div className="p-6">
-                {/* Personal Info Tab */}
                 {activeTab === "personal" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
@@ -429,7 +458,6 @@ const ViewApplications = () => {
                   </div>
                 )}
 
-                {/* Education Tab */}
                 {activeTab === "education" && (
                   <div className="grid gap-6 md:grid-cols-3">
                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -564,7 +592,6 @@ const ViewApplications = () => {
                   </div>
                 )}
 
-                {/* Experience Tab */}
                 {activeTab === "experience" && (
                   <div className="space-y-6">
                     <div>
@@ -675,7 +702,6 @@ const ViewApplications = () => {
                   </div>
                 )}
 
-                {/* Address Tab */}
                 {activeTab === "address" && (
                   <div className="grid gap-6 md:grid-cols-2">
                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -723,7 +749,6 @@ const ViewApplications = () => {
         })}
       </div>
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-between items-center mt-6">
           <button
