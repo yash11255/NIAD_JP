@@ -24,12 +24,13 @@ app.use(
     },
   })
 );
-app.use(cors({
-  origin: ["https://bito-jobs-client.vercel.app", "http://localhost:3000"], // Allow frontend URLs
-  credentials: true, // Allow cookies & authentication headers
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allow these HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.options("*", cors());
 app.use(cookieParser());
 
