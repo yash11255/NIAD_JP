@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const backendUrl = import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
+const backendUrl = import.meta.env?.VITE_BACKEND_URL || "https://bito-jobs-server.vercel.app";
 
 const RecruiterLogin = ({ isOpen, onClose }) => {
   const navigate = useNavigate();

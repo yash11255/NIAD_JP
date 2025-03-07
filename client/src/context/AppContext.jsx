@@ -29,7 +29,7 @@ export const AppContextProvider = (props) => {
   // console.log("appcontext user auth", isUserAuthenticated);
 
   const backendUrl =
-    import.meta.env?.VITE_BACKEND_URL || "http://localhost:5001";
+    import.meta.env?.VITE_BACKEND_URL || "https://bito-jobs-server.vercel.app";
 
   //central authentication check for company
   useEffect(() => {

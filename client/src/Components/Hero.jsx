@@ -165,11 +165,11 @@ const Hero = () => {
             </div>
 
             {/* Trusted By Section with Fixed Autoplay */}
-            <div className="border border-gray-300 shadow-md mx-2 mt-5 p-4 sm:p-6 rounded-md flex flex-col items-center">
-                <p className="font-bold mb-4 sm:mb-4">TRUSTED BY</p>
+            <div className="border border-gray-200 bg-white shadow-lg mx-2 mt-8 p-6 sm:p-8 rounded-xl">
+                <p className="font-bold text-center mb-6 text-gray-800 text-lg">TRUSTED BY</p>
 
                 <Swiper
-                    spaceBetween={30}
+                    spaceBetween={40}
                     slidesPerView={2}
                     breakpoints={{
                         640: { slidesPerView: 3 },
@@ -177,33 +177,33 @@ const Hero = () => {
                         1024: { slidesPerView: 5 },
                     }}
                     freeMode={true}
-                    speed={8000} // Smooth slow scrolling
+                    speed={8000}
                     loop={true}
                     autoplay={{
                         delay: 0,
-                        disableOnInteraction: false, // Prevents stopping on click
-                        pauseOnMouseEnter: false, // Prevents stopping on hover
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: false,
                     }}
                     modules={[Autoplay, FreeMode]}
-                    className="w-full"
+                    className="w-full grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
                 >
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.microsoft_logo} alt="Microsoft" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.microsoft_logo} alt="Microsoft" />
                     </SwiperSlide>
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.walmart_logo} alt="Walmart" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.walmart_logo} alt="Walmart" />
                     </SwiperSlide>
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.walmart_logo} alt="Google" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.walmart_logo} alt="Google" />
                     </SwiperSlide>
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.accenture_logo} alt="Accenture" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.accenture_logo} alt="Accenture" />
                     </SwiperSlide>
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.samsung_logo} alt="Samsung" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.samsung_logo} alt="Samsung" />
                     </SwiperSlide>
-                    <SwiperSlide>
-                        <img className="h-6 sm:h-8" src={assets.amazon_logo} alt="Amazon" />
+                    <SwiperSlide className="flex items-center justify-center">
+                        <img className="h-8 sm:h-10 object-contain" src={assets.amazon_logo} alt="Amazon" />
                     </SwiperSlide>
                 </Swiper>
             </div>

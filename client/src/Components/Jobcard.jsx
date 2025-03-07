@@ -6,17 +6,17 @@ const Jobcard = ({ job }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="border p-6 shadow-md rounded-lg transition-all duration-300 hover:shadow-lg bg-white">
+        <div className="bg-white rounded-xl border border-gray-200 hover:border-blue-200 p-5 transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,0,0,0.1)] group">
             {/* Header Section */}
             <div className="flex justify-between items-center">
-                <img className="h-10 w-10 object-contain" src={assets.company_icon} alt={job.companyId.name} />
+                <img className="h-10 w-10 object-contain" src={job.companyId.image} alt={job.companyId.name} />
                 <span className="bg-blue-100 text-blue-600 text-[10px] font-medium px-2 py-1 rounded-md">
                     {job.experience} Experience Required
                 </span>
             </div>
 
             {/* Job Title */}
-            <h4 className="font-semibold text-lg mt-3">{job.title}</h4>
+            <h4 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{job.title}</h4>
 
             {/* Job Info Badges */}
             <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
